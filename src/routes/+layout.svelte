@@ -14,14 +14,6 @@
 		{
 			url: '/app/curses',
 			name: 'Curses'
-		},
-		{
-			url: '/app/shop',
-			name: 'Shop'
-		},
-		{
-			url: '/app/hero',
-			name: 'Hero'
 		}
 	];
 
