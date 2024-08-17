@@ -35,7 +35,7 @@
 
 			if (previousLevel !== nextLevel) {
 				await databases.createDocument<Skill>('main', 'activity', ID.unique(), {
-					text: `${capitalizeFirstLetter(activeSkill.name)}" leveled up to ${nextLevel}`
+					text: `${capitalizeFirstLetter(activeSkill.name)} leveled up to ${nextLevel}`
 				});
 				await invalidate('skills:all');
 
