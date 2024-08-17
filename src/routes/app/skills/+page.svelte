@@ -299,9 +299,15 @@
 		>
 			<div>
 				<span class="text-3xl skill transform -translate-x-1">{skill.icon}</span>
-				<div class="mt-2 flex w-full h-1 bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700" role="progressbar">
-					<div class="flex flex-col justify-center rounded-full overflow-hidden text-xs text-white text-center whitespace-nowrap transition duration-500 bg-[#e18f49]" style={`width: ${getGraphProgress(skill, 100)}%`}></div>
-				  </div>
+				<div
+					class="mt-2 flex w-full h-1 bg-gray-200 rounded-full overflow-hidden dark:bg-neutral-700"
+					role="progressbar"
+				>
+					<div
+						class="flex flex-col justify-center rounded-full overflow-hidden text-xs text-white text-center whitespace-nowrap transition duration-500 bg-[#e18f49]"
+						style={`width: ${getGraphProgress(skill, 100)}%`}
+					></div>
+				</div>
 			</div>
 			<div class="relative h-full flex justify-end items-end">
 				<p class="absolute right-[calc(100%+16px)] -top-2 font-bold text-lg text-white">
