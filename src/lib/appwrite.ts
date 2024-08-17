@@ -7,6 +7,10 @@ export type Skill = {
 	xp: number;
 } & Models.Document;
 
+export type Activity = {
+	text: string;
+} & Models.Document;
+
 const client = new Client();
 client.setEndpoint('https://appwrite.life-in-skills.almostapps.eu/v1').setProject('life-in-skills');
 
