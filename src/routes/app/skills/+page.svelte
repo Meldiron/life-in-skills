@@ -210,6 +210,8 @@
 				type: 'log',
 				message: 'Skill successfully created'
 			});
+			// @ts-ignore
+			window.HSStaticMethods.autoInit();
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
