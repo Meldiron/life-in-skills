@@ -76,8 +76,9 @@
 				deaths: died ? data.combat.deaths + 1 : data.combat.deaths
 			});
 
+			const prefix = action.type === 'craving' ? 'Craved' : 'Healed with';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `Craved ${capitalizeFirstLetter(action.name)}`
+				text: `${prefix} ${capitalizeFirstLetter(action.name)}`
 			});
 
 			if (died) {
