@@ -1,3 +1,75 @@
+function celebrateCraving() {
+	var defaults = {
+		flat: true,
+		spread: 360,
+		ticks: 50,
+		gravity: 0,
+		scalar: 2,
+		decay: 0.95,
+		startVelocity: 30,
+		shapes: [
+			confetti.shapeFromText({ text: '❌', scalar: 6 }),
+			confetti.shapeFromText({ text: '😡', scalar: 6 }),
+			confetti.shapeFromText({ text: '🚨', scalar: 6 }),
+			confetti.shapeFromText({ text: '❗', scalar: 6 }),
+			confetti.shapeFromText({ text: '🔴', scalar: 6 })
+		]
+	};
+
+	function shoot() {
+		confetti({
+			...defaults,
+			particleCount: 40
+		});
+
+		confetti({
+			...defaults,
+			particleCount: 10
+		});
+	}
+
+	setTimeout(shoot, 0);
+	setTimeout(shoot, 200);
+	setTimeout(shoot, 300);
+	setTimeout(shoot, 600);
+}
+
+function celebratePotion() {
+	var defaults = {
+		flat: true,
+		spread: 360,
+		ticks: 50,
+		gravity: 0,
+		scalar: 2,
+		decay: 0.95,
+		startVelocity: 30,
+		shapes: [
+			confetti.shapeFromText({ text: '🌱', scalar: 6 }),
+			confetti.shapeFromText({ text: '💚', scalar: 6 }),
+			confetti.shapeFromText({ text: '🍏', scalar: 6 }),
+			confetti.shapeFromText({ text: '✅', scalar: 6 }),
+			confetti.shapeFromText({ text: '🟢', scalar: 6 })
+		]
+	};
+
+	function shoot() {
+		confetti({
+			...defaults,
+			particleCount: 40
+		});
+
+		confetti({
+			...defaults,
+			particleCount: 10
+		});
+	}
+
+	setTimeout(shoot, 0);
+	setTimeout(shoot, 200);
+	setTimeout(shoot, 300);
+	setTimeout(shoot, 600);
+}
+
 function celebrateLevel() {
 	const duration = 5 * 1000,
 		animationEnd = Date.now() + duration,

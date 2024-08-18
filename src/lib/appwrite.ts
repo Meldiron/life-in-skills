@@ -7,6 +7,17 @@ export type Skill = {
 	xp: number;
 } & Models.Document;
 
+export type Combat = {
+	hp: number;
+	deaths: number;
+} & Models.Document;
+
+export type CombatAction = {
+	name: string;
+	type: 'craving' | 'potion';
+	power: number;
+} & Models.Document;
+
 export type Activity = {
 	text: string;
 } & Models.Document;

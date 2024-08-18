@@ -1,14 +1,11 @@
 <script lang="ts">
-	import { databases, type Skill } from '$lib/appwrite';
+	import { databases, type Activity, type Skill } from '$lib/appwrite';
 	import { getLevel, getXp } from '$lib/levels';
 	import { ID } from 'appwrite';
 	import type { PageData } from './$types';
 	import { invalidate } from '$app/navigation';
 	import { toast } from '$lib/toast';
-
-	function capitalizeFirstLetter(string: string) {
-		return string.charAt(0).toUpperCase() + string.slice(1);
-	}
+	import { capitalizeFirstLetter } from '$lib/helpers';
 
 	export let data: PageData;
 
@@ -26,7 +23,7 @@
 			await databases.updateDocument<Skill>('main', 'skills', activeSkill.$id, {
 				xp: activeSkill.xp + amount
 			});
-			await databases.createDocument<Skill>('main', 'activity', ID.unique(), {
+			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `+${amount} XP in ${activeSkill.name}`
 			});
 
@@ -34,7 +31,7 @@
 			const nextLevel = getLevel(activeSkill.xp + amount);
 
 			if (previousLevel !== nextLevel) {
-				await databases.createDocument<Skill>('main', 'activity', ID.unique(), {
+				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `${capitalizeFirstLetter(activeSkill.name)} leveled up to ${nextLevel}`
 				});
 				await invalidate('skills:all');
@@ -213,7 +210,7 @@
 				icon: newSkillEmoji,
 				targetLevel: targetLevel
 			});
-			await databases.createDocument<Skill>('main', 'activity', ID.unique(), {
+			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `Started ${capitalizeFirstLetter(skillName)} skill`
 			});
 			await invalidate('skills:all');
@@ -225,6 +222,10 @@
 			});
 			// @ts-ignore
 			window.HSStaticMethods.autoInit();
+
+			skillName = '';
+			newSkillEmoji = '';
+			targetLevel = 10;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -254,32 +255,6 @@
 		</div>
 
 		<span>Skills</span>
-	</div>
-
-	<div
-		class="inline-flex border border-gray-200 rounded-full p-0.5 dark:border-neutral-700 items-center"
-	>
-		<a
-			href="/app/skills/activity"
-			class="inline-flex shrink-0 justify-center items-center py-1 px-3 rounded-full text-gray-500 hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus:bg-blue-100 focus:text-blue-800 dark:text-neutral-500 dark:hover:bg-blue-900 dark:hover:text-blue-200 dark:focus:bg-blue-900 dark:focus:text-blue-200"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="1.5"
-				stroke="currentColor"
-				class="shrink-0 size-4"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-				/>
-			</svg>
-
-			<p class="ml-2 text-sm text-neutral-400">Activity</p>
-		</a>
 	</div>
 </h2>
 
@@ -405,7 +380,7 @@
 				bind:value={skillName}
 				type="text"
 				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-				placeholder="For example: Studying, Cleaning, Agility, Cooking"
+				placeholder="Studying, Cleaning, Agility, Cooking, Hydration"
 			/>
 		</div>
 

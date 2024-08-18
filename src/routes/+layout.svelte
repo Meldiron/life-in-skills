@@ -12,8 +12,12 @@
 			name: 'Skills'
 		},
 		{
-			url: '/app/curses',
-			name: 'Curses'
+			url: '/app/combat',
+			name: 'Combat'
+		},
+		{
+			url: '/app/activity',
+			name: 'Activity'
 		}
 	];
 
