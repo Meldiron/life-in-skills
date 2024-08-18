@@ -200,7 +200,7 @@
 				role="progressbar"
 			>
 				<div
-					class="flex flex-col justify-center rounded-full overflow-hidden bg-green-500 text-xs text-white text-center whitespace-nowrap transition duration-500"
+					class={`${data.combat.hp <= 6 ? 'bg-red-500' : 'bg-green-500'} flex flex-col justify-center rounded-full overflow-hidden text-xs text-white text-center whitespace-nowrap transition duration-500`}
 					style={`width: ${Math.ceil((data.combat.hp / 12) * 100)}%`}
 				></div>
 			</div>
