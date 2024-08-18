@@ -21,7 +21,7 @@
 				Query.limit(50),
 				Query.cursorAfter(data.activities[data.activities.length - 1].$id)
 			]);
-			if (response.documents.length === 0) {
+			if (response.documents.length === 0 || response.documents.length < 50) {
 				canLoadMore = false;
 			}
 			data.activities = [...data.activities, ...response.documents];
