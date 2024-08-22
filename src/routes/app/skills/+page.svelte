@@ -6,10 +6,30 @@
 	import { invalidate } from '$app/navigation';
 	import { toast } from '$lib/toast';
 	import { capitalizeFirstLetter } from '$lib/helpers';
+	import * as moment from 'moment';
 
 	export let data: PageData;
 
 	let activeSkill: Skill | null = null;
+
+	function hasBonus(skill: Skill | null) {
+		if (!skill) {
+			return false;
+		}
+
+		if (!skill.lastActivityAt) {
+			return true;
+		}
+
+		const lastDate = moment.default(skill.lastActivityAt).format('YYYY-MM-DD');
+		const nowDate = moment.default(new Date()).format('YYYY-MM-DD');
+
+		if (lastDate === nowDate) {
+			return false;
+		}
+
+		return true;
+	}
 
 	let addingXp = false;
 	async function addXp(amount: number) {
@@ -17,11 +37,16 @@
 			return;
 		}
 
+		if (hasBonus(activeSkill)) {
+			amount += 3;
+		}
+
 		addingXp = true;
 
 		try {
 			await databases.updateDocument<Skill>('main', 'skills', activeSkill.$id, {
-				xp: activeSkill.xp + amount
+				xp: activeSkill.xp + amount,
+				lastActivityAt: new Date().toISOString()
 			});
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `+${amount} XP in ${activeSkill.name}`
@@ -346,7 +371,7 @@
 		<button
 			on:click={() => (activeSkill = skill)}
 			data-hs-overlay="#active-skill"
-			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : 'border-neutral-700'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 text-neutral-400`}
+			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : !hasBonus(skill) ? 'border-neutral-700' : 'border-neutral-400'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br ${!hasBonus(skill) ? 'from-neutral-900 via-neutral-900 to-neutral-950' : 'from-neutral-800 via-neutral-800 to-neutral-900'} text-neutral-400`}
 		>
 			<div>
 				<span class="text-3xl skill transform -translate-x-1">{skill.icon}</span>
@@ -782,6 +807,11 @@
 			>
 				<p class="text-neutral-400">Quick win</p>
 				<p class="text-white text-xs"><span class="text-lg">+1</span> XP</p>
+				{#if hasBonus(activeSkill)}
+					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+						+3XP bonus
+					</p>
+				{/if}
 			</button>
 			<button
 				disabled={addingXp}
@@ -791,6 +821,11 @@
 			>
 				<p class="text-neutral-200">Intermediate</p>
 				<p class="text-white text-xs"><span class="text-lg">+5</span> XP</p>
+				{#if hasBonus(activeSkill)}
+					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+						+3XP bonus
+					</p>
+				{/if}
 			</button>
 			<button
 				disabled={addingXp}
@@ -800,6 +835,12 @@
 			>
 				<p class="text-[#e18f49]">High effort</p>
 				<p class="text-white text-xs"><span class="text-lg">+10</span> XP</p>
+
+				{#if hasBonus(activeSkill)}
+					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+						+3XP bonus
+					</p>
+				{/if}
 			</button>
 		</div>
 	</div>
