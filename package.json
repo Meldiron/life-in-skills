@@ -33,6 +33,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@preline/overlay": "^2.4.1",
 		"appwrite": "^15.0.0",
 		"moment": "^2.30.1",
 		"preline": "^2.4.1"

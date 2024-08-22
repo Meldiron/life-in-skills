@@ -96,9 +96,38 @@
 		return totalLevel;
 	}
 
-	let skillName = '';
+	function editSkill() {
+		if (!activeSkill) {
+			return;
+		}
 
+		newIsEditing = true;
+		newSkillName = activeSkill.name;
+		newSkillEmoji = activeSkill.icon;
+		newSkillTargetLevel = activeSkill.targetLevel;
+
+		deleteDropdown = false;
+
+		// @ts-ignore
+		window.HSOverlay.open(document.getElementById('new-skill'));
+	}
+
+	function openNewSkill() {
+		newIsEditing = false;
+		newSkillName = '';
+		newSkillEmoji = '';
+		newSkillTargetLevel = 10;
+
+		deleteDropdown = false;
+
+		// @ts-ignore
+		window.HSOverlay.open(document.getElementById('new-skill'));
+	}
+
+	let newIsEditing = false;
+	let newSkillName = '';
 	let newSkillEmoji = '';
+	let newSkillTargetLevel = 10;
 	function onSkillEmojiChange(event: any) {
 		const newValue = event.target.value.replace(new RegExp(`^${newSkillEmoji}`), '');
 		newSkillEmoji = newValue;
@@ -149,11 +178,10 @@
 			description: 'Define your own goals and milestones'
 		};
 	}
-	let targetLevel = 10;
 	function decreaseTargetLevel() {
 		const keys = Object.keys(targetLevelData);
 
-		const current = getTargetLevelData(targetLevel);
+		const current = getTargetLevelData(newSkillTargetLevel);
 
 		if (current.level === targetLevelData[keys[0]].level) {
 			return;
@@ -164,7 +192,7 @@
 			const data = targetLevelData[dataKey];
 
 			if (data.level === current.level) {
-				targetLevel = lastValue;
+				newSkillTargetLevel = lastValue;
 				break;
 			}
 
@@ -175,7 +203,7 @@
 	function increaseTargetLevel() {
 		const keys = Object.keys(targetLevelData);
 
-		const current = getTargetLevelData(targetLevel);
+		const current = getTargetLevelData(newSkillTargetLevel);
 
 		if (current.level === targetLevelData[keys[keys.length - 1]].level) {
 			return;
@@ -186,7 +214,7 @@
 			const data = targetLevelData[dataKey];
 
 			if (isNext) {
-				targetLevel = data.level;
+				newSkillTargetLevel = data.level;
 				break;
 			}
 
@@ -205,14 +233,68 @@
 
 		creatingSkill = true;
 		try {
-			await databases.createDocument<Skill>('main', 'skills', ID.unique(), {
-				name: skillName,
-				icon: newSkillEmoji,
-				targetLevel: targetLevel
+			if (activeSkill) {
+				await databases.updateDocument<Skill>('main', 'skills', activeSkill.$id, {
+					name: newSkillName,
+					icon: newSkillEmoji,
+					targetLevel: newSkillTargetLevel
+				});
+				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
+					text: `Updated ${capitalizeFirstLetter(newSkillName)} skill`
+				});
+				toast.open({
+					type: 'log',
+					message: 'Skill successfully updated'
+				});
+			} else {
+				await databases.createDocument<Skill>('main', 'skills', ID.unique(), {
+					name: newSkillName,
+					icon: newSkillEmoji,
+					targetLevel: newSkillTargetLevel
+				});
+				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
+					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`
+				});
+				toast.open({
+					type: 'log',
+					message: 'Skill successfully created'
+				});
+			}
+
+			await invalidate('skills:all');
+
+			// @ts-ignore
+			window.HSOverlay.close(document.getElementById('new-skill'));
+			// @ts-ignore
+			window.HSStaticMethods.autoInit();
+
+			newSkillName = '';
+			newSkillEmoji = '';
+			newSkillTargetLevel = 10;
+		} catch (err: any) {
+			toast.open({
+				type: 'error',
+				message: err.message ? err.message : err.toString()
 			});
+		} finally {
+			creatingSkill = false;
+		}
+	}
+
+	let deleteDropdown = false;
+	async function deleteSkill() {
+		if (creatingSkill || !activeSkill) {
+			return;
+		}
+
+		creatingSkill = true;
+
+		try {
+			await databases.deleteDocument('main', 'skills', activeSkill.$id);
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `Started ${capitalizeFirstLetter(skillName)} skill`
+				text: `Deleted ${capitalizeFirstLetter(newSkillName)} skill`
 			});
+
 			await invalidate('skills:all');
 			// @ts-ignore
 			window.HSOverlay.close(document.getElementById('new-skill'));
@@ -220,12 +302,6 @@
 				type: 'log',
 				message: 'Skill successfully created'
 			});
-			// @ts-ignore
-			window.HSStaticMethods.autoInit();
-
-			skillName = '';
-			newSkillEmoji = '';
-			targetLevel = 10;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -260,7 +336,7 @@
 
 <div class="mt-6 grid grid-cols-8 sm:grid-cols-12 gap-3">
 	<div
-		class="col-span-4 flex flex-col items-center gap-0 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-neutral-950 to-black border-neutral-700 text-neutral-400"
+		class={`col-span-4 flex flex-col items-center gap-0 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-neutral-950 to-black border-neutral-700 text-neutral-400`}
 	>
 		<p>Total level</p>
 		<h2 class="font-bold text-white text-xl">{getTotalLevel(data.skills)}</h2>
@@ -270,7 +346,7 @@
 		<button
 			on:click={() => (activeSkill = skill)}
 			data-hs-overlay="#active-skill"
-			class="col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 border-neutral-700 text-neutral-400"
+			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : 'border-neutral-700'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 text-neutral-400`}
 		>
 			<div>
 				<span class="text-3xl skill transform -translate-x-1">{skill.icon}</span>
@@ -297,7 +373,7 @@
 	{/each}
 
 	<button
-		data-hs-overlay="#new-skill"
+		on:click={openNewSkill}
 		class="col-span-4 flex items-center gap-2 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-trasparent border-transparent text-neutral-400"
 	>
 		<svg
@@ -322,7 +398,9 @@
 	tabindex="-1"
 >
 	<div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
-		<h3 class="font-bold text-gray-800 dark:text-white">Start a new skill</h3>
+		<h3 class="font-bold text-gray-800 dark:text-white">
+			{newIsEditing ? 'Edit your skill' : 'Start a new skill'}
+		</h3>
 		<button
 			type="button"
 			class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
@@ -348,10 +426,12 @@
 		</button>
 	</div>
 	<form on:submit|preventDefault={onCreateSkill} class="p-4 flex flex-col gap-4">
-		<p class="text-gray-800 dark:text-neutral-400">
-			Define a new area of your life to track and improve. Achieve short-term or long-term visions
-			to improve your life.
-		</p>
+		{#if !newIsEditing}
+			<p class="text-gray-800 dark:text-neutral-400">
+				Define a new area of your life to track and improve. Achieve short-term or long-term visions
+				to improve your life.
+			</p>
+		{/if}
 
 		<div>
 			<div class="flex justify-between items-center">
@@ -377,7 +457,7 @@
 				>
 			</div>
 			<input
-				bind:value={skillName}
+				bind:value={newSkillName}
 				type="text"
 				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 				placeholder="Studying, Cleaning, Agility, Cooking, Hydration"
@@ -400,10 +480,10 @@
 				<div class="w-full flex justify-between items-center gap-x-3">
 					<div>
 						<span class="block font-medium text-sm text-gray-800 dark:text-white">
-							{getTargetLevelData(targetLevel).title}
+							{getTargetLevelData(newSkillTargetLevel).title}
 						</span>
 						<span class="block text-xs text-gray-500 dark:text-neutral-400">
-							{getTargetLevelData(targetLevel).description}
+							{getTargetLevelData(newSkillTargetLevel).description}
 						</span>
 					</div>
 					<div class="flex items-center gap-x-1.5">
@@ -430,7 +510,7 @@
 							</svg>
 						</button>
 						<input
-							bind:value={targetLevel}
+							bind:value={newSkillTargetLevel}
 							class="p-0 w-8 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white"
 							style="-moz-appearance: textfield;"
 							type="number"
@@ -465,14 +545,65 @@
 			<!-- End Input Number -->
 		</div>
 
-		<div>
+		<div class="flex flex-col sm:flex-row gap-2">
 			<button
 				disabled={creatingSkill}
 				type="submit"
-				class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#e18f49] text-white hover:bg-opacity-75 disabled:opacity-50 disabled:pointer-events-none"
+				class="justify-center py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#e18f49] text-white hover:bg-opacity-75 disabled:opacity-50 disabled:pointer-events-none"
 			>
-				Create skill
+				{newIsEditing ? 'Save changes' : 'Create skill'}
 			</button>
+
+			{#if newIsEditing}
+				<div class="relative">
+					<button
+						on:click={() => (deleteDropdown = !deleteDropdown)}
+						aria-haspopup="menu"
+						aria-expanded="false"
+						aria-label="Dropdown"
+						disabled={creatingSkill}
+						type="button"
+						class="justify-center py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:bg-red-600 disabled:opacity-50 disabled:pointer-events-none"
+					>
+						Delete skill
+					</button>
+					<div
+						class={`${deleteDropdown ? 'opacity-100' : 'opacity-0 hidden'} hs-dropdown-menu transition-[opacity,margin] duration shrink-0 min-w-[max-content] bg-white shadow-md rounded-lg p-1 space-y-0.5 mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700 absolute left-0 top-full`}
+						role="menu"
+						aria-orientation="vertical"
+						aria-labelledby="hs-dropdown-with-title"
+					>
+						<div class="py-2 first:pt-0 last:pb-0">
+							<span
+								class="shrink-0 block py-2 px-3 text-xs font-medium uppercase text-gray-400 dark:text-neutral-500"
+							>
+								Confirmation
+							</span>
+							<button
+								class="shrink-0 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+								on:click={deleteSkill}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="shrink-0 size-4"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+									/>
+								</svg>
+
+								<p class="shrink-0">Click to delete</p>
+							</button>
+						</div>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</form>
 </div>
@@ -493,29 +624,55 @@
 			</h3>
 		</div>
 
-		<button
-			type="button"
-			class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:focus:bg-neutral-700"
-			aria-label="Close"
-			data-hs-overlay="#active-skill"
-		>
-			<span class="sr-only">Close</span>
-			<svg
-				class="shrink-0 size-4"
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
+		<div class="items-center gap-2">
+			<button
+				on:click={editSkill}
+				type="button"
+				class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:focus:bg-neutral-700"
+				aria-label="Close"
 			>
-				<path d="M18 6 6 18"></path>
-				<path d="m6 6 12 12"></path>
-			</svg>
-		</button>
+				<span class="sr-only">Edit</span>
+
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="shrink-0 size-4"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+					/>
+				</svg>
+			</button>
+
+			<button
+				type="button"
+				class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:focus:bg-neutral-700"
+				aria-label="Close"
+				data-hs-overlay="#active-skill"
+			>
+				<span class="sr-only">Close</span>
+				<svg
+					class="shrink-0 size-4"
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M18 6 6 18"></path>
+					<path d="m6 6 12 12"></path>
+				</svg>
+			</button>
+		</div>
 	</div>
 	<div class="p-4">
 		<div class="grid grid-cols-6 sm:grid-cols-12 gap-4">

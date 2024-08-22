@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as Overlay from '@preline/overlay';
+
 	import '../app.css';
 	import { afterNavigate } from '$app/navigation';
 	import type { PageData } from './$types';

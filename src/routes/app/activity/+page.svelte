@@ -7,6 +7,37 @@
 
 	export let data: PageData;
 
+	let days: any = [];
+	$: {
+		data;
+
+		syncDays();
+
+		days = days;
+	}
+
+	function syncDays() {
+		for (const activity of data.activities) {
+			const dateKey = moment.default(activity.$createdAt).format('YYYY-MM-DD');
+
+			let daysDate = days.find((day: any) => day.date === dateKey);
+			if (!daysDate) {
+				days.push({
+					date: dateKey,
+					activities: []
+				});
+			}
+
+			daysDate = days.find((day: any) => day.date === dateKey);
+
+			daysDate.activities.push(activity);
+		}
+
+		days = days.sort((a: any, b: any) => {
+			return moment.default(b.date).unix() > moment.default(a.date).unix() ? 1 : -1;
+		});
+	}
+
 	let canLoadMore = data.activities.length >= 50;
 	let loading = false;
 	async function loadMore() {
@@ -27,6 +58,9 @@
 			data.activities = [...data.activities, ...response.documents];
 			data.activities = data.activities;
 			data = data;
+
+			syncDays();
+			days = days;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -67,46 +101,56 @@
 <div class="mt-6">
 	<!-- Timeline -->
 	<div class="relative">
-		{#each data.activities as activity}
-			<!-- Item -->
-			<div class="flex gap-x-3">
-				<!-- Icon -->
-				<div
-					class="relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700"
-				>
-					<div class="relative z-10 size-7 flex justify-center items-center">
-						<div class="size-2 rounded-full bg-gray-400 dark:bg-neutral-600"></div>
-					</div>
-				</div>
-				<!-- End Icon -->
-
-				<!-- Right Content -->
-				<div class="grow pt-0.5 pb-8">
-					<h3 class="flex gap-x-1.5 font-semibold text-gray-800 dark:text-white">
-						{activity.text}
-					</h3>
-					<p class="mt-1 text-sm text-gray-600 dark:text-neutral-500 flex items-center gap-1">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							class="size-4"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-							/>
-						</svg>
-
-						{moment.default(activity.$createdAt).format('D MMM YYYY \\a\\t HH:mm')}
-					</p>
-				</div>
-				<!-- End Right Content -->
+		{#each days as day}
+			<!-- Heading -->
+			<div class="ps-2 my-2 first:mt-0">
+				<h3 class="text-lg text-white font-bold">
+					{moment.default(day.date).format('D MMM YYYY')}
+				</h3>
 			</div>
-			<!-- End Item -->
+			<!-- End Heading -->
+
+			{#each day.activities as activity}
+				<!-- Item -->
+				<div class="flex gap-x-3">
+					<!-- Icon -->
+					<div
+						class="relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700"
+					>
+						<div class="relative z-10 size-7 flex justify-center items-center">
+							<div class="size-2 rounded-full bg-gray-400 dark:bg-neutral-600"></div>
+						</div>
+					</div>
+					<!-- End Icon -->
+
+					<!-- Right Content -->
+					<div class="grow pt-0.5 pb-8">
+						<h3 class="flex gap-x-1.5 text-sm text-neutral-300">
+							{activity.text}
+						</h3>
+						<p class="mt-1 text-sm text-gray-600 dark:text-neutral-500 flex items-center gap-1">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="size-4"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+								/>
+							</svg>
+
+							{moment.default(activity.$createdAt).format('HH:mm')}
+						</p>
+					</div>
+					<!-- End Right Content -->
+				</div>
+				<!-- End Item -->
+			{/each}
 		{/each}
 	</div>
 
