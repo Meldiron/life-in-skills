@@ -31,8 +31,11 @@
 
 <div class="px-3 sm:p-0 max-w-[30rem] flex flex-col mx-auto size-full">
 	<header class="mb-auto flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full text-sm py-4">
-		<nav class="w-full px-4 sm:flex sm:items-center sm:justify-between sm:px-0 lg:px-0">
+		<nav class="w-full sm:flex sm:items-center sm:justify-between sm:px-0 lg:px-0">
 			<div class="flex items-center justify-between">
+				<a href="/" class="shrink-0">
+					<img src="/logo.svg" alt="Logo" class="size-6 mr-3" />
+				</a>
 				<a
 					class="text-[#e18f49] flex-none text-xl font-semibold focus:outline-none focus:opacity-80"
 					href="/">Life <span class="text-neutral-200">in</span> Skills</a
