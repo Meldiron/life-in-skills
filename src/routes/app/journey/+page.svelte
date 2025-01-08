@@ -94,7 +94,7 @@
 			</svg>
 		</div>
 
-		<span>Activity</span>
+		<span>Journey</span>
 	</div>
 </h2>
 

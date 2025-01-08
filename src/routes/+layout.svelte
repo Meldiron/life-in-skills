@@ -18,8 +18,8 @@
 			name: 'Combat'
 		},
 		{
-			url: '/app/activity',
-			name: 'Activity'
+			url: '/app/journey',
+			name: 'Journey'
 		}
 	];
 

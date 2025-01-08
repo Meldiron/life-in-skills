@@ -6,6 +6,9 @@ export type Skill = {
 	targetLevel: number;
 	xp: number;
 	lastActivityAt: string;
+	bigXpName: string;
+	mediumXpName: string;
+	smallXpName: string;
 } & Models.Document;
 
 export type Combat = {

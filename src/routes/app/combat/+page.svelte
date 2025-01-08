@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 	import { databases, type Activity, type CombatAction } from '$lib/appwrite';
 	import { capitalizeFirstLetter } from '$lib/helpers';
 	import { toast } from '$lib/toast';
@@ -36,7 +36,7 @@
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `Added ${capitalizeFirstLetter(newName)} craving`
 			});
-			await invalidate('combat:all');
+			await invalidateAll();
 			// @ts-ignore
 			window.HSOverlay.close(document.getElementById('new-' + type));
 			toast.open({
@@ -87,7 +87,7 @@
 				});
 			}
 
-			await invalidate('combat:all');
+			await invalidateAll();
 
 			if (died) {
 				toast.open({

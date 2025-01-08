@@ -3,7 +3,7 @@
 	import { getLevel, getXp } from '$lib/levels';
 	import { ID } from 'appwrite';
 	import type { PageData } from './$types';
-	import { invalidate } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 	import { toast } from '$lib/toast';
 	import { capitalizeFirstLetter } from '$lib/helpers';
 	import * as moment from 'moment';
@@ -59,7 +59,7 @@
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `${capitalizeFirstLetter(activeSkill.name)} leveled up to ${nextLevel}`
 				});
-				await invalidate('skills:all');
+				await invalidateAll();
 
 				// @ts-ignore
 				celebrateLevel();
@@ -69,7 +69,7 @@
 					message: `<b>${capitalizeFirstLetter(activeSkill.name)}</b> leveled up to <b>${nextLevel}</b>`
 				});
 			} else {
-				await invalidate('skills:all');
+				await invalidateAll();
 			}
 
 			activeSkill.xp += amount;
@@ -130,6 +130,9 @@
 		newSkillName = activeSkill.name;
 		newSkillEmoji = activeSkill.icon;
 		newSkillTargetLevel = activeSkill.targetLevel;
+		newSkillSmallXpName = activeSkill.smallXpName ?? 'Quick win';
+		newSkillMdiumXpName = activeSkill.mediumXpName ?? 'Regular';
+		newSkillBigXpName = activeSkill.bigXpName ?? 'High effort';
 
 		deleteDropdown = false;
 
@@ -138,10 +141,15 @@
 	}
 
 	function openNewSkill() {
+		activeSkill = null;
+		
 		newIsEditing = false;
 		newSkillName = '';
 		newSkillEmoji = '';
 		newSkillTargetLevel = 10;
+		newSkillSmallXpName = 'Quick win';
+		newSkillMdiumXpName = 'Regular';
+		newSkillBigXpName = 'High effort';
 
 		deleteDropdown = false;
 
@@ -153,6 +161,10 @@
 	let newSkillName = '';
 	let newSkillEmoji = '';
 	let newSkillTargetLevel = 10;
+	let newSkillSmallXpName = 'Quick win';
+	let newSkillMdiumXpName = 'Regular';
+	let newSkillBigXpName = 'High effort';
+
 	function onSkillEmojiChange(event: any) {
 		const newValue = event.target.value.replace(new RegExp(`^${newSkillEmoji}`), '');
 		newSkillEmoji = newValue;
@@ -262,7 +274,10 @@
 				await databases.updateDocument<Skill>('main', 'skills', activeSkill.$id, {
 					name: newSkillName,
 					icon: newSkillEmoji,
-					targetLevel: newSkillTargetLevel
+					targetLevel: newSkillTargetLevel,
+					smallXpName: newSkillSmallXpName,
+					mediumXpName: newSkillMdiumXpName,
+					bigXpName: newSkillBigXpName
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `Updated ${capitalizeFirstLetter(newSkillName)} skill`
@@ -286,7 +301,7 @@
 				});
 			}
 
-			await invalidate('skills:all');
+			await invalidateAll();
 
 			// @ts-ignore
 			window.HSOverlay.close(document.getElementById('new-skill'));
@@ -320,7 +335,7 @@
 				text: `Deleted ${capitalizeFirstLetter(newSkillName)} skill`
 			});
 
-			await invalidate('skills:all');
+			await invalidateAll();
 			// @ts-ignore
 			window.HSOverlay.close(document.getElementById('new-skill'));
 			toast.open({
@@ -572,6 +587,50 @@
 			<!-- End Input Number -->
 		</div>
 
+		{#if newIsEditing}
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>Quick win action</label
+					>
+				</div>
+				<input
+					bind:value={newSkillSmallXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Read 1 page, Drink 1 glass of water, Do 10 push-ups, ..."
+				/>
+			</div>
+
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>Regular action</label
+					>
+				</div>
+				<input
+					bind:value={newSkillMdiumXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Do 50 push-ups, Read a chapter, write 500 words, ..."
+				/>
+			</div>
+
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>High effort action</label
+					>
+				</div>
+				<input
+					bind:value={newSkillBigXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Go to gym, Write an article, Release a new feature, ..."
+				/>
+			</div>
+		{/if}
+
 		<div class="flex flex-col sm:flex-row gap-2">
 			<button
 				disabled={creatingSkill}
@@ -754,7 +813,7 @@
 				<!-- List Group -->
 				<ul class="flex flex-col justify-end text-start -space-y-px">
 					<li
-						class="flex items-center gap-x-2 p-3 py-2 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-1.5 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Current level </span>
@@ -764,7 +823,7 @@
 						</div>
 					</li>
 					<li
-						class="flex items-center gap-x-2 p-3 py-2 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-1.5 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Target level </span>
@@ -774,7 +833,7 @@
 						</div>
 					</li>
 					<li
-						class="flex items-center gap-x-2 p-3 py-1.5 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Total XP </span>
@@ -784,7 +843,7 @@
 						</div>
 					</li>
 					<li
-						class="flex items-center gap-x-2 p-3 py-1.5 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Remaining XP </span>
@@ -807,7 +866,7 @@
 				type="button"
 				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-neutral-400">Quick win</p>
+				<p class="text-neutral-400">{activeSkill?.smallXpName}</p>
 				<p class="text-white text-xs"><span class="text-lg">+1</span> XP</p>
 				{#if hasBonus(activeSkill)}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
@@ -821,7 +880,7 @@
 				type="button"
 				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-neutral-200">Intermediate</p>
+				<p class="text-neutral-200">{activeSkill?.mediumXpName}</p>
 				<p class="text-white text-xs"><span class="text-lg">+5</span> XP</p>
 				{#if hasBonus(activeSkill)}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
@@ -835,7 +894,7 @@
 				type="button"
 				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-[#e18f49]">High effort</p>
+				<p class="text-[#e18f49]">{activeSkill?.bigXpName}</p>
 				<p class="text-white text-xs"><span class="text-lg">+10</span> XP</p>
 
 				{#if hasBonus(activeSkill)}
