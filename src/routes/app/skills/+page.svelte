@@ -142,7 +142,7 @@
 
 	function openNewSkill() {
 		activeSkill = null;
-		
+
 		newIsEditing = false;
 		newSkillName = '';
 		newSkillEmoji = '';
@@ -857,17 +857,21 @@
 			</div>
 		</div>
 
-		<hr class="border-neutral-800 my-6 border-[1px]" />
+		<hr class="hidden sm:block border-neutral-800 my-6 border-[1px]" />
+
+		<div class="block sm:hidden mt-6"></div>
 
 		<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
 			<button
 				disabled={addingXp}
 				on:click={() => addXp(1)}
 				type="button"
-				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-neutral-400">{activeSkill?.smallXpName}</p>
-				<p class="text-white text-xs"><span class="text-lg">+1</span> XP</p>
+				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+					<p class="text-neutral-400 line-clamp-1">{activeSkill?.smallXpName}</p>
+					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
+				</div>
 				{#if hasBonus(activeSkill)}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
 						+3XP bonus
@@ -878,10 +882,12 @@
 				disabled={addingXp}
 				on:click={() => addXp(5)}
 				type="button"
-				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-neutral-200">{activeSkill?.mediumXpName}</p>
-				<p class="text-white text-xs"><span class="text-lg">+5</span> XP</p>
+			<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+				<p class="text-neutral-200 line-clamp-1">{activeSkill?.mediumXpName}</p>
+				<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
+			</div>
 				{#if hasBonus(activeSkill)}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
 						+3XP bonus
@@ -892,10 +898,12 @@
 				disabled={addingXp}
 				on:click={() => addXp(10)}
 				type="button"
-				class="rounded-3xl sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-				<p class="text-[#e18f49]">{activeSkill?.bigXpName}</p>
-				<p class="text-white text-xs"><span class="text-lg">+10</span> XP</p>
+			<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+				<p class="text-[#e18f49] line-clamp-1">{activeSkill?.bigXpName}</p>
+				<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
+			</div>
 
 				{#if hasBonus(activeSkill)}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
