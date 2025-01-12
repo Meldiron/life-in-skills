@@ -9,14 +9,10 @@
 
 	let days: any = [];
 	$: {
-		data;
-
-		syncDays();
-
-		days = days;
+		syncDays(data);
 	}
 
-	function syncDays() {
+	function syncDays(data: PageData) {
 		for (const activity of data.activities) {
 			const dateKey = moment.default(activity.$createdAt).format('YYYY-MM-DD');
 
@@ -29,6 +25,11 @@
 			}
 
 			daysDate = days.find((day: any) => day.date === dateKey);
+
+			const existingActivity = daysDate.activities.find((a: any) => a.$id === activity.$id);
+			if (existingActivity) {
+				continue;
+			}
 
 			daysDate.activities.push(activity);
 		}
@@ -59,7 +60,7 @@
 			data.activities = data.activities;
 			data = data;
 
-			syncDays();
+			syncDays(data);
 			days = days;
 		} catch (err: any) {
 			toast.open({
@@ -124,28 +125,33 @@
 					<!-- End Icon -->
 
 					<!-- Right Content -->
-					<div class="grow pt-0.5 pb-8">
-						<h3 class="flex gap-x-1.5 text-sm text-neutral-300">
-							{activity.text}
-						</h3>
-						<p class="mt-1 text-sm text-gray-600 dark:text-neutral-500 flex items-center gap-1">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="size-4"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-								/>
-							</svg>
+					<div class="grow pt-0.5 pb-6">
+						<div class="flex items-center gap-3">
+							<h3 class="flex text-lg text-neutral-300">
+								{activity.text}
+							</h3>
+							<p class="text-sm text-gray-600 dark:text-neutral-500 flex items-center gap-1">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="size-4"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+									/>
+								</svg>
 
-							{moment.default(activity.$createdAt).format('HH:mm')}
-						</p>
+								{moment.default(activity.$createdAt).format('HH:mm')}
+							</p>
+						</div>
+						{#if activity.note}
+							<p class="text-neutral-500 mt-1">{activity.note}</p>
+						{/if}
 					</div>
 					<!-- End Right Content -->
 				</div>

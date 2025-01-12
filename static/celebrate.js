@@ -73,7 +73,7 @@ function celebratePotion() {
 function celebrateLevel() {
 	const duration = 5 * 1000,
 		animationEnd = Date.now() + duration,
-		defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+		defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 999 };
 
 	function randomInRange(min, max) {
 		return Math.random() * (max - min) + min;
@@ -107,7 +107,8 @@ function celebrateLevel() {
 function celebrateSmall() {
 	const count = 50,
 		defaults = {
-			origin: { y: 0.9, x: 0.4 }
+			origin: { y: 0.9, x: 0.3 },
+			zIndex: 999
 		};
 
 	function fire(particleRatio, opts) {
@@ -137,7 +138,8 @@ function celebrateSmall() {
 function celebrateBig() {
 	const count = 250,
 		defaults = {
-			origin: { y: 0.9, x: 0.6 }
+			origin: { y: 0.9, x: 0.6 },
+			zIndex: 999
 		};
 
 	function fire(particleRatio, opts) {

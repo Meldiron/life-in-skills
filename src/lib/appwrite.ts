@@ -25,6 +25,7 @@ export type CombatAction = {
 
 export type Activity = {
 	text: string;
+	note: string;
 } & Models.Document;
 
 export type PublicProfile = {

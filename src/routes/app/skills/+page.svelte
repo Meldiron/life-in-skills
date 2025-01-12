@@ -33,12 +33,25 @@
 		return true;
 	}
 
+	let addXpAmount = 0;
+	let activityNote = '';
+
+	function addXpStart(amount: number) {
+		addXpAmount = amount;
+
+		activityNote = '';
+
+		// @ts-ignore
+		window.HSOverlay.open(document.getElementById('skill-activity'));
+	}
+
 	let addingXp = false;
-	async function addXp(amount: number) {
-		if (!activeSkill || addingXp) {
+	async function addXpFinish() {
+		if (!activeSkill || addingXp || !addXpAmount) {
 			return;
 		}
 
+		let amount = addXpAmount;
 		if (hasBonus(activeSkill) && bonusXp > 0) {
 			amount += bonusXp;
 		}
@@ -51,7 +64,8 @@
 				lastActivityAt: new Date().toISOString()
 			});
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `+${amount} XP in ${activeSkill.name}`
+				text: `+${amount} XP in ${activeSkill.name}`,
+				note: activityNote
 			});
 
 			const previousLevel = getLevel(activeSkill.xp);
@@ -74,18 +88,26 @@
 				await invalidateAll();
 			}
 
+			// @ts-ignore
+			window.HSOverlay.close(document.getElementById('skill-activity'));
+
+			// @ts-ignore
+			window.HSOverlay.open(document.getElementById('active-skill'));
+
 			activeSkill.xp += amount;
 
-			if (amount === 1) {
-				// @ts-ignore
-				celebrateSmall();
-			} else if (amount === 5) {
-				// @ts-ignore
-				celebrateMedium();
-			} else if (amount === 10) {
-				// @ts-ignore
-				celebrateBig();
-			}
+			setTimeout(() => {
+				if (amount === 1) {
+					// @ts-ignore
+					celebrateSmall();
+				} else if (amount === 5) {
+					// @ts-ignore
+					celebrateMedium();
+				} else if (amount === 10) {
+					// @ts-ignore
+					celebrateBig();
+				}
+			}, 300);
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -635,7 +657,7 @@
 					>Regular action (+5XP)</label
 				>
 
-				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Dedicated session</span>
+				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Focused session</span>
 			</div>
 			<input
 				bind:value={newSkillMdiumXpName}
@@ -650,7 +672,7 @@
 				<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
 					>High effort action (+10 XP)</label
 				>
-				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Total commitment</span>
+				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1+ hours effort</span>
 			</div>
 			<input
 				bind:value={newSkillBigXpName}
@@ -731,13 +753,22 @@
 	tabindex="-1"
 >
 	<div class="flex justify-between items-center py-2 px-4">
-		<div class="flex gap-2">
-			<div class="bg-neutral-800 py-2 px-3 text-sm rounded-2xl">
+		<div class="flex gap-2 items-center gap-3">
+			<div class="bg-neutral-800 py-2 px-3 text-2xl rounded-xl h-[fit-content]">
 				<span>{activeSkill?.icon ?? ''}</span>
 			</div>
-			<h3 id="hs-offcanvas-bottom-label" class="font-bold text-gray-800 text-2xl dark:text-white">
-				{activeSkill?.name ?? ''}
-			</h3>
+			<div>
+				<h3
+					id="hs-offcanvas-bottom-label"
+					class="line-clamp-1 font-bold text-gray-800 text-xl dark:text-white"
+				>
+					{activeSkill?.name ?? ''}
+				</h3>
+
+				<p class="text-sm text-neutral-500 line-clamp-1">
+					{activeSkill?.reward ?? 'No reward set yet'}
+				</p>
+			</div>
 		</div>
 
 		<div class="items-center gap-2">
@@ -894,7 +925,7 @@
 		<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
 			<button
 				disabled={addingXp}
-				on:click={() => addXp(1)}
+				on:click={() => addXpStart(1)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -910,7 +941,7 @@
 			</button>
 			<button
 				disabled={addingXp}
-				on:click={() => addXp(5)}
+				on:click={() => addXpStart(5)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -926,7 +957,7 @@
 			</button>
 			<button
 				disabled={addingXp}
-				on:click={() => addXp(10)}
+				on:click={() => addXpStart(10)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -942,5 +973,79 @@
 				{/if}
 			</button>
 		</div>
+	</div>
+</div>
+
+<div
+	id="skill-activity"
+	class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
+	role="dialog"
+	tabindex="-1"
+>
+	<div
+		class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto"
+	>
+		<form
+			on:submit|preventDefault={addXpFinish}
+			class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70"
+		>
+			<div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
+				<h3 class="font-bold text-gray-800 dark:text-white">Activity</h3>
+				<button
+					type="button"
+					class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
+					aria-label="Close"
+					data-hs-overlay="#skill-activity"
+				>
+					<span class="sr-only">Close</span>
+					<svg
+						class="shrink-0 size-4"
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M18 6 6 18"></path>
+						<path d="m6 6 12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 overflow-y-auto">
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
+					>What were you doing?</label
+				>
+				<input
+					type="text"
+					required={true}
+					bind:value={activityNote}
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
+					placeholder="Clean washing machine, Watered garden, Math homework, ..."
+					autofocus={true}
+				/>
+			</div>
+			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
+				<button
+					disabled={addingXp}
+					on:click={addXpFinish}
+					type="button"
+					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+					data-hs-overlay="#hs-focus-management-modal"
+				>
+					Skip
+				</button>
+				<button
+					disabled={addingXp}
+					type="submit"
+					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+				>
+					Save details
+				</button>
+			</div>
+		</form>
 	</div>
 </div>
