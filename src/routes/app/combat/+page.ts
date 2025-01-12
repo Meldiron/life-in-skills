@@ -10,8 +10,6 @@ import {
 import { ID, Query } from 'appwrite';
 
 export const load: PageLoad = async ({ parent, depends }) => {
-	depends('combat:all');
-
 	const data = await parent();
 
 	async function getCombatData() {

@@ -10,6 +10,8 @@
 
 	export let data: PageData;
 
+	let bonusXp = data.user.prefs?.dailyBonus ?? 3;
+
 	let activeSkill: Skill | null = null;
 
 	function hasBonus(skill: Skill | null) {
@@ -37,8 +39,8 @@
 			return;
 		}
 
-		if (hasBonus(activeSkill)) {
-			amount += 3;
+		if (hasBonus(activeSkill) && bonusXp > 0) {
+			amount += bonusXp;
 		}
 
 		addingXp = true;
@@ -666,6 +668,7 @@
 								Confirmation
 							</span>
 							<button
+								disabled={creatingSkill}
 								class="shrink-0 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
 								on:click={deleteSkill}
 							>
@@ -872,9 +875,9 @@
 					<p class="text-neutral-400 line-clamp-1">{activeSkill?.smallXpName}</p>
 					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
 				</div>
-				{#if hasBonus(activeSkill)}
+				{#if hasBonus(activeSkill) && bonusXp > 0}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-						+3XP bonus
+						+{bonusXp}XP bonus
 					</p>
 				{/if}
 			</button>
@@ -884,13 +887,13 @@
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-			<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-				<p class="text-neutral-200 line-clamp-1">{activeSkill?.mediumXpName}</p>
-				<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
-			</div>
-				{#if hasBonus(activeSkill)}
+				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+					<p class="text-neutral-200 line-clamp-1">{activeSkill?.mediumXpName}</p>
+					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
+				</div>
+				{#if hasBonus(activeSkill) && bonusXp > 0}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-						+3XP bonus
+						+{bonusXp}XP bonus
 					</p>
 				{/if}
 			</button>
@@ -900,14 +903,14 @@
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
-			<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-				<p class="text-[#e18f49] line-clamp-1">{activeSkill?.bigXpName}</p>
-				<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
-			</div>
+				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+					<p class="text-[#e18f49] line-clamp-1">{activeSkill?.bigXpName}</p>
+					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
+				</div>
 
-				{#if hasBonus(activeSkill)}
+				{#if hasBonus(activeSkill) && bonusXp > 0}
 					<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-						+3XP bonus
+						+{bonusXp}XP bonus
 					</p>
 				{/if}
 			</button>

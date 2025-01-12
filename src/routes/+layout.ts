@@ -10,8 +10,6 @@ export const load: PageLoad = async () => {
 		user = await account.get();
 	} catch (err) {}
 
-	console.log(user);
-
 	return {
 		user
 	};

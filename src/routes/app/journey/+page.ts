@@ -4,8 +4,6 @@ import { type Skill, databases, type Activity } from '$lib/appwrite';
 import { Query } from 'appwrite';
 
 export const load: PageLoad = async ({ parent, depends }) => {
-	depends('skills:all');
-
 	const data = await parent();
 
 	const response = await databases.listDocuments<Activity>('main', 'activity', [
