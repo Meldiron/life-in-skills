@@ -8,15 +8,20 @@
 	export let data: PageData;
 
 	// Public profile
-	let hasProfileOnInit = data.user.prefs?.isPublic && data.user.prefs?.publicPath;
+	$: hasProfileOnInit = data.user.prefs?.isPublic && data.user.prefs?.publicPath;
 
-	let isPublic = data.user.prefs?.isPublic ?? false;
-	let publicPath = data.user.prefs?.publicPath ?? ID.unique();
-	let publicNickname = data.user.prefs?.publicNickname ?? '';
+	const uniqueId = ID.unique();
 
-	let originalIsPublic = isPublic;
-	let originalPublicPath = publicPath;
-	let originalNickname = publicNickname;
+	$: isPublic2 = data.user.prefs?.isPublic ?? false;
+	$: publicPath2 = data.user.prefs?.publicPath ?? uniqueId;
+	$: publicNickname2 = data.user.prefs?.publicNickname ?? '';
+	$: publicPath = publicPath2;
+	$: publicNickname = publicNickname2;
+	$: isPublic = isPublic2;
+
+	$: originalIsPublic = data.user.prefs?.isPublic ?? false;
+	$: originalPublicPath = data.user.prefs?.publicPath ?? uniqueId;
+	$: originalNickname = data.user.prefs?.publicNickname ?? '';
 
 	$: madeProfileChanges =
 		isPublic !== originalIsPublic ||
@@ -75,8 +80,9 @@
 	}
 
 	// Daily bonus
-	let dailyBonus = data.user.prefs?.dailyBonus ?? 3;
-	let originalDailyBonus = dailyBonus;
+	$: dailyBonus2 = data.user.prefs?.dailyBonus ?? 3;
+	$: dailyBonus = dailyBonus2;
+	$: originalDailyBonus = data.user.prefs?.dailyBonus ?? 3;
 	$: madeDailyBonusChanges = dailyBonus !== originalDailyBonus;
 
 	$: {

@@ -10,7 +10,7 @@
 
 	export let data: PageData;
 
-	let bonusXp = data.user.prefs?.dailyBonus ?? 3;
+	$: bonusXp = data.user.prefs?.dailyBonus ?? 3;
 
 	let activeSkill: Skill | null = null;
 
