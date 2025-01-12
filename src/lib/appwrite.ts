@@ -4,6 +4,7 @@ export type Skill = {
 	name: string;
 	icon: string;
 	targetLevel: number;
+	reward: string;
 	xp: number;
 	lastActivityAt: string;
 	bigXpName: string;
