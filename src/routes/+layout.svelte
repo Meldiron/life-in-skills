@@ -6,7 +6,12 @@
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 
 	const links = [
 		{
@@ -103,6 +108,7 @@
 						{/each}
 
 						<a
+							aria-label="Settings"
 							class="font-medium bg-neutral-800 rounded-full p-1.5 text-white/70 hover:text-white focus:outline-none focus:text-white"
 							href="/app/settings"
 						>
@@ -129,7 +135,7 @@
 
 	<main id="content">
 		<div class="pt-6">
-			<slot></slot>
+			{@render children?.()}
 		</div>
 	</main>
 </div>

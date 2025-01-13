@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { tick } from "svelte";
-	import SkillSettings from "./SkillSettings.svelte";
-	import { getGraphProgress, getLevel, getXp } from "$lib/levels";
-	import SkillActivity from "./SkillActivity.svelte";
-	import { hasBonus } from "$lib/skills";
-	import type { Skill } from "$lib/appwrite";
+	import { tick } from 'svelte';
+	import SkillSettings from './SkillSettings.svelte';
+	import { getGraphProgress, getLevel, getXp } from '$lib/levels';
+	import SkillActivity from './SkillActivity.svelte';
+	import { hasBonus } from '$lib/skills';
+	import type { Skill } from '$lib/appwrite';
 
 	interface Props {
 		skill: Skill;
@@ -12,7 +12,9 @@
 
 	let { skill }: Props = $props();
 
-	let isEditing = false;
+	let bonusXp = 1; // TODO: Get from user prefs
+
+	let isEditing = $state(false);
 	async function editSkill() {
 		isEditing = true;
 		await tick();
@@ -20,14 +22,16 @@
 		window.HSOverlay.open(document.getElementById('new-skill'));
 	}
 
-	let isAddingActivity = false;
-	let activityXp = 0;
+	let isAddingActivity = $state(false);
+	let activityXp = $state(0);
 	async function addActivity(amount: number) {
 		activityXp = amount;
 		isAddingActivity = true;
 		await tick();
 		// @ts-ignore
 		window.HSOverlay.open(document.getElementById('skill-activity'));
+		await tick();
+		document.getElementById('skill-activity-note')?.focus();
 	}
 </script>
 
@@ -40,25 +44,25 @@
 	<div class="flex justify-between items-center py-2 px-4">
 		<div class="flex gap-2 items-center gap-3">
 			<div class="bg-neutral-800 py-2 px-3 text-2xl rounded-xl h-[fit-content]">
-				<span>{skill?.icon ?? ''}</span>
+				<span>{skill.icon ?? ''}</span>
 			</div>
 			<div>
 				<h3
 					id="hs-offcanvas-bottom-label"
 					class="line-clamp-1 font-bold text-gray-800 text-xl dark:text-white"
 				>
-					{skill?.name ?? ''}
+					{skill.name ?? ''}
 				</h3>
 
 				<p class="text-sm text-neutral-500 line-clamp-1">
-					{skill?.reward ?? 'No reward set yet'}
+					{skill.reward ?? 'No reward set yet'}
 				</p>
 			</div>
 		</div>
 
 		<div class="items-center gap-2">
 			<button
-				on:click={editSkill}
+				onclick={editSkill}
 				type="button"
 				class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:focus:bg-neutral-700"
 				aria-label="Close"
@@ -146,7 +150,7 @@
 						class="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
 					>
 						<span class="text-3xl font-bold text-[#e18f49]"
-							>{getXp(getLevel(skill?.xp ?? 0)) - (skill?.xp ?? 0)}
+							>{getXp(getLevel(skill.xp ?? 0)) - (skill.xp ?? 0)}
 							<span class="text-xs">XP</span></span
 						>
 						<span class="text-neutral-100 block">to level up</span>
@@ -164,7 +168,7 @@
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Current level </span>
 							<button type="button" class="flex items-center text-lg gap-x-2 font-semibold">
-								{getLevel(skill?.xp ?? 0)}
+								{getLevel(skill.xp ?? 0)}
 							</button>
 						</div>
 					</li>
@@ -174,7 +178,7 @@
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Target level </span>
 							<button type="button" class="flex items-center text-lg gap-x-2 font-semibold">
-								{skill?.targetLevel ?? 0}
+								{skill.targetLevel ?? 0}
 							</button>
 						</div>
 					</li>
@@ -184,7 +188,7 @@
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Total XP </span>
 							<button type="button" class="flex items-center gap-x-2">
-								{skill?.xp ?? 0}
+								{skill.xp ?? 0}
 							</button>
 						</div>
 					</li>
@@ -194,7 +198,7 @@
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Remaining XP </span>
 							<button type="button" class="flex items-center gap-x-2">
-								{getXp(skill?.targetLevel ?? 0) - (skill?.xp ?? 0)}
+								{getXp(skill.targetLevel ?? 0) - (skill.xp ?? 0)}
 							</button>
 						</div>
 					</li>
@@ -209,13 +213,12 @@
 
 		<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
 			<button
-				disabled={addingXp}
-				on:click={() => addActivity(1)}
+				onclick={() => addActivity(1)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
 				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-					<p class="text-neutral-400 line-clamp-1">{activeSkill?.smallXpName}</p>
+					<p class="text-neutral-400 line-clamp-1">{skill.smallXpName}</p>
 					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
 				</div>
 				{#if hasBonus(skill) && bonusXp > 0}
@@ -225,13 +228,12 @@
 				{/if}
 			</button>
 			<button
-				disabled={addingXp}
-				on:click={() => addActivity(5)}
+				onclick={() => addActivity(5)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
 				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-					<p class="text-neutral-200 line-clamp-1">{activeSkill?.mediumXpName}</p>
+					<p class="text-neutral-200 line-clamp-1">{skill.mediumXpName}</p>
 					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
 				</div>
 				{#if hasBonus(skill) && bonusXp > 0}
@@ -241,13 +243,12 @@
 				{/if}
 			</button>
 			<button
-				disabled={addingXp}
-				on:click={() => addActivity(10)}
+				onclick={() => addActivity(10)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
 				<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-					<p class="text-[#e18f49] line-clamp-1">{activeSkill?.bigXpName}</p>
+					<p class="text-[#e18f49] line-clamp-1">{skill.bigXpName}</p>
 					<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
 				</div>
 
@@ -261,8 +262,8 @@
 	</div>
 </div>
 
-<SkillSettings skill={skill} />
+<SkillSettings {skill} />
 
 {#if isAddingActivity}
-<SkillActivity amount={activityXp} skill={skill} />
+	<SkillActivity amount={activityXp} {skill} />
 {/if}

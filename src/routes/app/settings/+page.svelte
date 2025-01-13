@@ -1,34 +1,43 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import { ID } from 'appwrite';
 	import type { PageData } from './$types';
 	import { type PublicProfile, account, databases } from '$lib/appwrite';
 	import { toast } from '$lib/toast';
 	import { goto, invalidateAll } from '$app/navigation';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	// Public profile
-	$: hasProfileOnInit = data.user.prefs?.isPublic && data.user.prefs?.publicPath;
+	let hasProfileOnInit = $derived(data.user?.prefs?.isPublic && data.user?.prefs?.publicPath);
 
 	const uniqueId = ID.unique();
 
-	$: isPublic2 = data.user.prefs?.isPublic ?? false;
-	$: publicPath2 = data.user.prefs?.publicPath ?? uniqueId;
-	$: publicNickname2 = data.user.prefs?.publicNickname ?? '';
-	$: publicPath = publicPath2;
-	$: publicNickname = publicNickname2;
-	$: isPublic = isPublic2;
+	let isPublic2 = $derived(data.user?.prefs?.isPublic ?? false);
+	let isPublic = $state(isPublic2);
 
-	$: originalIsPublic = data.user.prefs?.isPublic ?? false;
-	$: originalPublicPath = data.user.prefs?.publicPath ?? uniqueId;
-	$: originalNickname = data.user.prefs?.publicNickname ?? '';
+	let publicPath2 = $derived(data.user?.prefs?.publicPath ?? uniqueId);
+	let publicPath = $state(publicPath2);
 
-	$: madeProfileChanges =
+	let publicNickname2 = $derived(data.user?.prefs?.publicNickname ?? '');
+	let publicNickname = $state(publicNickname2);
+
+	let originalIsPublic = $derived(data.user?.prefs?.isPublic ?? false);
+	let originalPublicPath = $derived(data.user?.prefs?.publicPath ?? uniqueId);
+	let originalNickname = $derived(data.user?.prefs?.publicNickname ?? '');
+
+	let madeProfileChanges = $derived(
 		isPublic !== originalIsPublic ||
-		publicPath !== originalPublicPath ||
-		publicNickname !== originalNickname;
+			publicPath !== originalPublicPath ||
+			publicNickname !== originalNickname
+	);
 
-	let isUpdatingPublicProfile = false;
+	let isUpdatingPublicProfile = $state(false);
 	async function updatePublicProfile() {
 		if (isUpdatingPublicProfile) {
 			return;
@@ -44,14 +53,14 @@
 					'publicProfiles',
 					publicPath
 				);
-				if (doc && doc.userId === data.user.$id) {
+				if (doc && doc.userId === data.user?.$id) {
 					needsCreation = false;
 				}
 			} catch (err) {}
 
 			if (isPublic && needsCreation) {
 				await databases.createDocument<PublicProfile>('main', 'publicProfiles', publicPath, {
-					userId: data.user.$id
+					userId: data.user?.$id
 				});
 			}
 
@@ -80,18 +89,13 @@
 	}
 
 	// Daily bonus
-	$: dailyBonus2 = data.user.prefs?.dailyBonus ?? 3;
-	$: dailyBonus = dailyBonus2;
-	$: originalDailyBonus = data.user.prefs?.dailyBonus ?? 3;
-	$: madeDailyBonusChanges = dailyBonus !== originalDailyBonus;
+	let dailyBonus2 = $derived(data.user?.prefs?.dailyBonus ?? 3);
+	let dailyBonus = $state(dailyBonus2);
+	
+	let originalDailyBonus = $derived(data.user?.prefs?.dailyBonus ?? 3);
+	let madeDailyBonusChanges = $derived(dailyBonus !== originalDailyBonus);
 
-	$: {
-		if (dailyBonus < 0) {
-			dailyBonus = 0;
-		}
-	}
-
-	let isUpdatingDailyBonus = false;
+	let isUpdatingDailyBonus = $state(false);
 	async function updateDailyBonus() {
 		if (isUpdatingDailyBonus) {
 			return;
@@ -123,7 +127,7 @@
 	}
 
 	// Account management
-	let isLoggingOut = false;
+	let isLoggingOut = $state(false);
 
 	async function logOut() {
 		if (isLoggingOut) {
@@ -152,8 +156,8 @@
 		}
 	}
 
-	let deleteDropdown = false;
-	let isDeleting = false;
+	let deleteDropdown = $state(false);
+	let isDeleting = $state(false);
 
 	async function deleteAccount() {
 		if (isDeleting) {
@@ -208,7 +212,7 @@
 
 <div class="mt-6 flex flex-col gap-y-4">
 	<form
-		on:submit|preventDefault={updatePublicProfile}
+		onsubmit={preventDefault(updatePublicProfile)}
 		class="border rounded-xl shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700"
 	>
 		<!-- Uploading File Content -->
@@ -338,7 +342,7 @@
 	</form>
 
 	<form
-		on:submit|preventDefault={updateDailyBonus}
+		onsubmit={preventDefault(updateDailyBonus)}
 		class="border rounded-xl shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700"
 	>
 		<!-- Uploading File Content -->
@@ -393,7 +397,7 @@
 				<div class="flex justify-end items-center gap-x-1.5">
 					<button
 						type="button"
-						on:click={() => dailyBonus--}
+						onclick={() => dailyBonus--}
 						class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 						tabindex="-1"
 						aria-label="Decrease"
@@ -416,7 +420,7 @@
 					</button>
 					<button
 						type="button"
-						on:click={() => dailyBonus++}
+						onclick={() => dailyBonus++}
 						class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 						tabindex="-1"
 						aria-label="Increase"
@@ -495,7 +499,7 @@
 			</a>
 
 			<button
-				on:click={logOut}
+				onclick={logOut}
 				disabled={isLoggingOut}
 				type="button"
 				class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-yellow-500 text-yellow-500 hover:border-yellow-400 focus:outline-none focus:border-yellow-400 focus:text-yellow-400 disabled:opacity-50 disabled:pointer-events-none"
@@ -506,7 +510,7 @@
 			<div class="relative">
 				<button
 					disabled={isDeleting}
-					on:click={() => (deleteDropdown = !deleteDropdown)}
+					onclick={() => (deleteDropdown = !deleteDropdown)}
 					type="button"
 					class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-red-500 hover:bg-red-100 focus:outline-none focus:bg-red-100 hover:text-red-800 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-red-800/30 dark:hover:text-red-400 dark:focus:bg-red-800/30 dark:focus:text-red-400"
 				>
@@ -527,7 +531,7 @@
 						<button
 							disabled={isDeleting}
 							class="shrink-0 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
-							on:click={deleteAccount}
+							onclick={deleteAccount}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

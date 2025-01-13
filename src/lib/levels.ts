@@ -1,4 +1,4 @@
-import type { Skill } from "./appwrite";
+import type { Skill } from './appwrite';
 
 const maxLevel = 120;
 
@@ -142,20 +142,19 @@ export function getLevel(xp: number) {
 	return maxLevel;
 }
 
-
 export function getGraphProgress(skill: Skill | null | undefined, max = 75) {
-    if (!skill) {
-        return 0;
-    }
+	if (!skill) {
+		return 0;
+	}
 
-    const level = getLevel(skill.xp);
-    const lastLevel = level - 1;
+	const level = getLevel(skill.xp);
+	const lastLevel = level - 1;
 
-    const xp = getXp(level);
-    const lastXp = lastLevel === 0 ? 0 : getXp(lastLevel);
+	const xp = getXp(level);
+	const lastXp = lastLevel === 0 ? 0 : getXp(lastLevel);
 
-    const progress = skill.xp - lastXp;
-    const progressMax = xp - lastXp;
+	const progress = skill.xp - lastXp;
+	const progressMax = xp - lastXp;
 
-    return Math.ceil((progress / progressMax) * max);
+	return Math.ceil((progress / progressMax) * max);
 }

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import { databases, type Activity, type CombatAction } from '$lib/appwrite';
 	import { capitalizeFirstLetter } from '$lib/helpers';
@@ -6,7 +8,11 @@
 	import { ID } from 'appwrite';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	function getCravings(actions: CombatAction[]) {
 		return actions.filter((a) => a.type === 'craving');
@@ -16,9 +22,9 @@
 		return actions.filter((a) => a.type === 'potion');
 	}
 
-	let newName = '';
-	let newPower = 3;
-	let creatingAction = false;
+	let newName = $state('');
+	let newPower = $state(3);
+	let creatingAction = $state(false);
 
 	async function onCreateAction(type: 'craving' | 'potion') {
 		if (creatingAction) {
@@ -55,7 +61,7 @@
 		}
 	}
 
-	let doingAction = false;
+	let doingAction = $state(false);
 	async function doAction(action: CombatAction) {
 		if (doingAction) {
 			return;
@@ -220,7 +226,7 @@
 				{#each getCravings(data.combatActions) as craving}
 					<button
 						disabled={doingAction}
-						on:click={() => doAction(craving)}
+						onclick={() => doAction(craving)}
 						type="button"
 						class="py-3 px-4 inline-flex items-start gap-x-2 first:rounded-t-md text-sm font-medium focus:z-10 border-gray-200 border-b-0 border bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 					>
@@ -264,7 +270,7 @@
 				{#each getPotions(data.combatActions) as potion}
 					<button
 						disabled={doingAction}
-						on:click={() => doAction(potion)}
+						onclick={() => doAction(potion)}
 						type="button"
 						class="p-3 inline-flex items-start gap-x-2 first:rounded-t-md text-sm font-medium focus:z-10 border-gray-200 border-b-0 border bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 					>
@@ -334,7 +340,7 @@
 			</svg>
 		</button>
 	</div>
-	<form on:submit|preventDefault={() => onCreateAction('craving')} class="p-4 flex flex-col gap-4">
+	<form onsubmit={preventDefault(() => onCreateAction('craving'))} class="p-4 flex flex-col gap-4">
 		<p class="text-gray-800 dark:text-neutral-400">
 			Define a bad habit you want to quit. You lose health points every time you fail to resist the
 			craving.
@@ -417,7 +423,7 @@
 			</svg>
 		</button>
 	</div>
-	<form on:submit|preventDefault={() => onCreateAction('potion')} class="p-4 flex flex-col gap-4">
+	<form onsubmit={preventDefault(() => onCreateAction('potion'))} class="p-4 flex flex-col gap-4">
 		<p class="text-gray-800 dark:text-neutral-400">
 			Define a consequence for your temptations. You gain health points by taking a potion.
 		</p>

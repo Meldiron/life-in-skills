@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { invalidateAll } from '$app/navigation';
 	import { databases, functions, type Activity, type Skill } from '$lib/appwrite';
 	import { capitalizeFirstLetter } from '$lib/helpers';
@@ -6,21 +8,21 @@
 	import { ExecutionMethod, ID } from 'appwrite';
 
 	interface Props {
-		skill: Skill;
+		skill: Skill | null;
 	}
 
 	let { skill }: Props = $props();
 
-	let newIsEditing = false;
-	let newSkillName = '';
-	let newSkillReward = '';
-	let newSkillEmoji = '';
-	let newSkillTargetLevel = 10;
-	let newSkillSmallXpName = 'Quick win';
-	let newSkillMdiumXpName = 'Regular';
-	let newSkillBigXpName = 'High effort';
+	let newIsEditing = $state(false);
+	let newSkillName = $state('');
+	let newSkillReward = $state('');
+	let newSkillEmoji = $state('');
+	let newSkillTargetLevel = $state(10);
+	let newSkillSmallXpName = $state('Quick win');
+	let newSkillMdiumXpName = $state('Regular');
+	let newSkillBigXpName = $state('High effort');
 
-	let creatingSkill = false;
+	let creatingSkill = $state(false);
 	async function onCreateSkill() {
 		if (creatingSkill) {
 			return;
@@ -82,7 +84,7 @@
 		}
 	}
 
-	let deleteDropdown = false;
+	let deleteDropdown = $state(false);
 	async function deleteSkill() {
 		if (creatingSkill || !skill) {
 			return;
@@ -114,7 +116,7 @@
 	}
 
 	let usedEmojis: any = {};
-	let generatingEmoji = false;
+	let generatingEmoji = $state(false);
 	async function generateEmoji() {
 		if (generatingEmoji) {
 			return;
@@ -289,7 +291,7 @@
 			</svg>
 		</button>
 	</div>
-	<form on:submit|preventDefault={onCreateSkill} class="p-4 flex flex-col gap-4">
+	<form onsubmit={preventDefault(onCreateSkill)} class="p-4 flex flex-col gap-4">
 		{#if !newIsEditing}
 			<p class="text-gray-800 dark:text-neutral-400">
 				Define a new area of your life to track and improve. Achieve short-term or long-term visions
@@ -324,15 +326,16 @@
 				<input
 					disabled={generatingEmoji}
 					value={newSkillEmoji}
-					on:input={onSkillEmojiChange}
+					oninput={onSkillEmojiChange}
 					type="text"
 					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 					placeholder="For example: 🦷 👟 💪 🧹 📚"
 				/>
 
 				<button
+					aria-label="Generate emoji"
 					disabled={generatingEmoji || !newSkillName}
-					on:click={generateEmoji}
+					onclick={generateEmoji}
 					type="button"
 					class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-4 py-3 text-center disabled:opacity-50"
 				>
@@ -377,7 +380,7 @@
 					<div class="flex items-center gap-x-1.5">
 						<button
 							type="button"
-							on:click={decreaseTargetLevel}
+							onclick={decreaseTargetLevel}
 							class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 							tabindex="-1"
 							aria-label="Decrease"
@@ -406,7 +409,7 @@
 						/>
 						<button
 							type="button"
-							on:click={increaseTargetLevel}
+							onclick={increaseTargetLevel}
 							class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 							tabindex="-1"
 							aria-label="Increase"
@@ -513,7 +516,7 @@
 			{#if newIsEditing}
 				<div class="relative">
 					<button
-						on:click={() => (deleteDropdown = !deleteDropdown)}
+						onclick={() => (deleteDropdown = !deleteDropdown)}
 						aria-haspopup="menu"
 						aria-expanded="false"
 						aria-label="Dropdown"
@@ -538,7 +541,7 @@
 							<button
 								disabled={creatingSkill}
 								class="shrink-0 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
-								on:click={deleteSkill}
+								onclick={deleteSkill}
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"

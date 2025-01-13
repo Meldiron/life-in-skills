@@ -1,16 +1,19 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { databases, type Activity } from '$lib/appwrite';
 	import { toast } from '$lib/toast';
 	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
 	import * as moment from 'moment';
 
-	export let data: PageData;
-
-	let days: any = [];
-	$: {
-		syncDays(data);
+	interface Props {
+		data: PageData;
 	}
+
+	let { data = $bindable() }: Props = $props();
+
+	let days: any = $state([]);
 
 	function syncDays(data: PageData) {
 		for (const activity of data.activities) {
@@ -39,8 +42,8 @@
 		});
 	}
 
-	let canLoadMore = data.activities.length >= 50;
-	let loading = false;
+	let canLoadMore = $state(data.activities.length >= 50);
+	let loading = $state(false);
 	async function loadMore() {
 		if (loading) {
 			return;
@@ -71,6 +74,9 @@
 			loading = false;
 		}
 	}
+	run(() => {
+		syncDays(data);
+	});
 </script>
 
 <h2
@@ -167,7 +173,7 @@
 	{#if canLoadMore}
 		<button
 			disabled={loading}
-			on:click={loadMore}
+			onclick={loadMore}
 			type="button"
 			class="mt-2 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
 		>

@@ -1,24 +1,26 @@
 <script lang="ts">
-	import { invalidateAll } from "$app/navigation";
-	import { databases, type Activity, type Skill } from "$lib/appwrite";
-	import { capitalizeFirstLetter } from "$lib/helpers";
-	import { getLevel } from "$lib/levels";
-	import { hasBonus } from "$lib/skills";
-	import { toast } from "$lib/toast";
-	import { ID } from "appwrite";
+	import { preventDefault } from 'svelte/legacy';
 
-    interface Props {
+	import { invalidateAll } from '$app/navigation';
+	import { databases, type Activity, type Skill } from '$lib/appwrite';
+	import { capitalizeFirstLetter } from '$lib/helpers';
+	import { getLevel } from '$lib/levels';
+	import { hasBonus } from '$lib/skills';
+	import { toast } from '$lib/toast';
+	import { ID } from 'appwrite';
+
+	interface Props {
 		amount: number;
-        skill: Skill;
+		skill: Skill;
 	}
 
-    let { amount, skill }: Props = $props();
+	let { amount, skill }: Props = $props();
 
-	let activityNote = '';
+	let activityNote = $state('');
 
-    let bonusXp = 1; // TODO: From user prefs
+	let bonusXp = 1; // TODO: From user prefs
 
-    let addingXp = false;
+	let addingXp = $state(false);
 	async function addXpFinish() {
 		if (!skill || addingXp || !amount) {
 			return;
@@ -105,7 +107,7 @@
 		class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto"
 	>
 		<form
-			on:submit|preventDefault={addXpFinish}
+			onsubmit={preventDefault(addXpFinish)}
 			class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70"
 		>
 			<div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
@@ -139,18 +141,18 @@
 					>What were you doing?</label
 				>
 				<input
+					id="skill-activity-note"
 					type="text"
 					required={true}
 					bind:value={activityNote}
 					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
 					placeholder="Clean washing machine, Watered garden, Math homework, ..."
-					autofocus={true}
 				/>
 			</div>
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
 				<button
 					disabled={addingXp}
-					on:click={addXpFinish}
+					onclick={addXpFinish}
 					type="button"
 					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
 					data-hs-overlay="#hs-focus-management-modal"

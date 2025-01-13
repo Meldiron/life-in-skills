@@ -13,14 +13,14 @@
 
 	let { skills }: Props = $props();
 
-    let isCreatingSkill = false;
+	let isCreatingSkill = $state(false);
 	async function openNewSkill() {
-        isCreatingSkill = true;
-        await tick();
+		isCreatingSkill = true;
+		await tick();
 
 		// @ts-ignore
 		window.HSOverlay.open(document.getElementById('new-skill'));
-    }
+	}
 
 	function getTotalLevel(skills: Skill[]) {
 		let totalLevel = 0;
@@ -32,16 +32,16 @@
 		return totalLevel;
 	}
 
-	let activeSkill: Skill | null = null;
+	let activeSkill: Skill | null = $state(null);
 
-    async function activateSkill(skill: Skill) {
-        activeSkill = skill;
+	async function activateSkill(skill: Skill) {
+		activeSkill = skill;
 
-        await tick();
+		await tick();
 
 		// @ts-ignore
 		window.HSOverlay.open(document.getElementById('active-skill'));
-    }
+	}
 </script>
 
 <div class="mt-6 grid grid-cols-8 sm:grid-cols-12 gap-3">
@@ -54,7 +54,7 @@
 
 	{#each skills as skill}
 		<button
-			on:click={() => activateSkill(skill)}
+			onclick={() => activateSkill(skill)}
 			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : !hasBonus(skill) ? 'border-neutral-700' : 'border-neutral-400'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br ${!hasBonus(skill) ? 'from-neutral-900 via-neutral-900 to-neutral-950' : 'from-neutral-800 via-neutral-800 to-neutral-900'} text-neutral-400`}
 		>
 			<div>
@@ -82,7 +82,7 @@
 	{/each}
 
 	<button
-		on:click={openNewSkill}
+		onclick={openNewSkill}
 		class="col-span-4 flex items-center gap-2 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-trasparent border-transparent text-neutral-400"
 	>
 		<svg
@@ -100,10 +100,10 @@
 	</button>
 </div>
 
-{#if isCreatingSkill}
-    <SkillSettings skill={null} />
-{/if}
+
+	<SkillSettings skill={null} />
+
 
 {#if activeSkill}
-    <SkillDetail skill={activeSkill} />
+	<SkillDetail skill={activeSkill} />
 {/if}
