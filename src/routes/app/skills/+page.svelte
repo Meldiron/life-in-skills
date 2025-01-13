@@ -386,6 +386,7 @@
 		}
 	}
 
+	let usedEmojis: any = {};
 	let generatingEmoji = false;
 	async function generateEmoji() {
 		if (generatingEmoji) {
@@ -398,7 +399,8 @@
 			const execution = await functions.createExecution(
 				'api',
 				JSON.stringify({
-					skillName: newSkillName
+					skillName: newSkillName,
+					usedEmojis: usedEmojis[newSkillName] ?? []
 				}),
 				false,
 				'/v1/ai/emoji',
@@ -411,6 +413,11 @@
 			}
 
 			newSkillEmoji = execution.responseBody;
+
+			if (!usedEmojis[newSkillName]) {
+				usedEmojis[newSkillName] = [];
+			}
+			usedEmojis[newSkillName].push(newSkillEmoji);
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -698,51 +705,55 @@
 			/>
 		</div>
 
-		<div>
-			<div class="flex justify-between items-center">
-				<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-					>Quick win action (+1XP)</label
-				>
-				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1-5 min effort</span>
+		{#if newIsEditing}
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>Quick win action (+1XP)</label
+					>
+					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1-5 min effort</span>
+				</div>
+				<input
+					bind:value={newSkillSmallXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Read 1 page, Drink 1 glass of water, Do 10 push-ups, ..."
+				/>
 			</div>
-			<input
-				bind:value={newSkillSmallXpName}
-				type="text"
-				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-				placeholder="Read 1 page, Drink 1 glass of water, Do 10 push-ups, ..."
-			/>
-		</div>
 
-		<div>
-			<div class="flex justify-between items-center">
-				<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-					>Regular action (+5XP)</label
-				>
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>Regular action (+5XP)</label
+					>
 
-				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Focused session</span>
+					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Focused session</span
+					>
+				</div>
+				<input
+					bind:value={newSkillMdiumXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Do 50 push-ups, Read a chapter, write 500 words, ..."
+				/>
 			</div>
-			<input
-				bind:value={newSkillMdiumXpName}
-				type="text"
-				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-				placeholder="Do 50 push-ups, Read a chapter, write 500 words, ..."
-			/>
-		</div>
 
-		<div>
-			<div class="flex justify-between items-center">
-				<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-					>High effort action (+10 XP)</label
-				>
-				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1+ hours effort</span>
+			<div>
+				<div class="flex justify-between items-center">
+					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
+						>High effort action (+10 XP)</label
+					>
+					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1+ hours effort</span
+					>
+				</div>
+				<input
+					bind:value={newSkillBigXpName}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="Go to gym, Write an article, Release a new feature, ..."
+				/>
 			</div>
-			<input
-				bind:value={newSkillBigXpName}
-				type="text"
-				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-				placeholder="Go to gym, Write an article, Release a new feature, ..."
-			/>
-		</div>
+		{/if}
 
 		<div class="flex flex-col sm:flex-row gap-2">
 			<button

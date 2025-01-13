@@ -6,12 +6,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
 type UpdateSchedulerIntervalBody struct {
-	SkillName string `json:"skillName"`
+	SkillName  string   `json:"skillName"`
+	UsedEmojis []string `json:"usedEmojis"`
 }
 
 func CreateAiEmoji(Context openruntimes.Context) openruntimes.Response {
@@ -23,6 +25,10 @@ func CreateAiEmoji(Context openruntimes.Context) openruntimes.Response {
 
 	if body.SkillName == "" {
 		return Context.Res.Text("Skill name is required.", Context.Res.WithStatusCode(400))
+	}
+
+	if len(body.UsedEmojis) >= 5 {
+		return Context.Res.Text("🤷", Context.Res.WithStatusCode(200))
 	}
 
 	// Ensure it's user-executed
@@ -46,7 +52,7 @@ func CreateAiEmoji(Context openruntimes.Context) openruntimes.Response {
 		Messages: []OpenAIBodyMessage{
 			OpenAIBodyMessage{
 				Role:    "developer",
-				Content: "User will provide a habit, skill, or in general their goal, activity, achievement, or resolution. Respond with only one symbol which is emoji that best represents user's input.",
+				Content: "User will provide a habit, skill, or in general their goal, activity, achievement, or resolution. Respond with only one symbol which is emoji that best represents user's input. Do not respond with following emojis: " + strings.Join(body.UsedEmojis, " "),
 			},
 			OpenAIBodyMessage{
 				Role:    "user",
