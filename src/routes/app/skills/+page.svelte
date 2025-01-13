@@ -59,22 +59,29 @@
 		addingXp = true;
 
 		try {
+			const oldXp = activeSkill.xp;
+			activeSkill.xp = activeSkill.xp + amount;
+			activeSkill.lastActivityAt = new Date().toISOString();
+
 			await databases.updateDocument<Skill>('main', 'skills', activeSkill.$id, {
-				xp: activeSkill.xp + amount,
-				lastActivityAt: new Date().toISOString()
+				xp: activeSkill.xp,
+				lastActivityAt: activeSkill.lastActivityAt
 			});
+
+
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `+${amount} XP in ${activeSkill.name}`,
 				note: activityNote
 			});
 
-			const previousLevel = getLevel(activeSkill.xp);
-			const nextLevel = getLevel(activeSkill.xp + amount);
+			const previousLevel = getLevel(oldXp);
+			const nextLevel = getLevel(activeSkill.xp);
 
 			if (previousLevel !== nextLevel) {
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `${capitalizeFirstLetter(activeSkill.name)} leveled up to ${nextLevel}`
 				});
+
 				await invalidateAll();
 
 				// @ts-ignore
@@ -93,8 +100,6 @@
 
 			// @ts-ignore
 			window.HSOverlay.open(document.getElementById('active-skill'));
-
-			activeSkill.xp += amount;
 
 			setTimeout(() => {
 				if (amount === 1) {
