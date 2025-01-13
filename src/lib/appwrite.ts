@@ -1,4 +1,4 @@
-import { Client, Account, Databases, type Models } from 'appwrite';
+import { Client, Account, Databases, type Models, Functions } from 'appwrite';
 
 export type Skill = {
 	name: string;
@@ -37,3 +37,4 @@ client.setEndpoint('https://appwrite.life-in-skills.almostapps.eu/v1').setProjec
 
 export const account = new Account(client);
 export const databases = new Databases(client);
+export const functions = new Functions(client);

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { databases, type Activity, type Skill } from '$lib/appwrite';
+	import { databases, type Activity, type Skill, functions } from '$lib/appwrite';
 	import { getLevel, getXp } from '$lib/levels';
-	import { ID } from 'appwrite';
+	import { ExecutionMethod, ID } from 'appwrite';
 	import type { PageData } from './$types';
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import { toast } from '$lib/toast';
@@ -67,7 +67,6 @@
 				xp: activeSkill.xp,
 				lastActivityAt: activeSkill.lastActivityAt
 			});
-
 
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `+${amount} XP in ${activeSkill.name}`,
@@ -386,6 +385,41 @@
 			creatingSkill = false;
 		}
 	}
+
+	let generatingEmoji = false;
+	async function generateEmoji() {
+		if (generatingEmoji) {
+			return;
+		}
+
+		generatingEmoji = true;
+
+		try {
+			const execution = await functions.createExecution(
+				'api',
+				JSON.stringify({
+					skillName: newSkillName
+				}),
+				false,
+				'/v1/ai/emoji',
+				ExecutionMethod.POST,
+				{}
+			);
+
+			if (execution.responseStatusCode !== 200) {
+				throw new Error(execution.responseBody);
+			}
+
+			newSkillEmoji = execution.responseBody;
+		} catch (err: any) {
+			toast.open({
+				type: 'error',
+				message: err.message ? err.message : err.toString()
+			});
+		} finally {
+			generatingEmoji = false;
+		}
+	}
 </script>
 
 <h2
@@ -533,13 +567,36 @@
 				<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Emoji recommended</span
 				>
 			</div>
-			<input
-				value={newSkillEmoji}
-				on:input={onSkillEmojiChange}
-				type="text"
-				class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-				placeholder="For example: 🦷 👟 💪 🧹 📚"
-			/>
+			<div class="flex items-center space-x-1">
+				<input
+					disabled={generatingEmoji}
+					value={newSkillEmoji}
+					on:input={onSkillEmojiChange}
+					type="text"
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+					placeholder="For example: 🦷 👟 💪 🧹 📚"
+				/>
+
+				<button
+					disabled={generatingEmoji || !newSkillName}
+					on:click={generateEmoji}
+					type="button"
+					class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-4 py-3 text-center disabled:opacity-50"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="size-4"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M9 4.5a.75.75 0 0 1 .721.544l.813 2.846a3.75 3.75 0 0 0 2.576 2.576l2.846.813a.75.75 0 0 1 0 1.442l-2.846.813a3.75 3.75 0 0 0-2.576 2.576l-.813 2.846a.75.75 0 0 1-1.442 0l-.813-2.846a3.75 3.75 0 0 0-2.576-2.576l-2.846-.813a.75.75 0 0 1 0-1.442l2.846-.813A3.75 3.75 0 0 0 7.466 7.89l.813-2.846A.75.75 0 0 1 9 4.5ZM18 1.5a.75.75 0 0 1 .728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 0 1 0 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 0 1-1.456 0l-.258-1.036a2.625 2.625 0 0 0-1.91-1.91l-1.036-.258a.75.75 0 0 1 0-1.456l1.036-.258a2.625 2.625 0 0 0 1.91-1.91l.258-1.036A.75.75 0 0 1 18 1.5ZM16.5 15a.75.75 0 0 1 .712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 0 1 0 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 0 1-1.422 0l-.395-1.183a1.5 1.5 0 0 0-.948-.948l-1.183-.395a.75.75 0 0 1 0-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0 1 16.5 15Z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</button>
+			</div>
 		</div>
 
 		<div>
