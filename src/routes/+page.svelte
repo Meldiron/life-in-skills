@@ -1,3 +1,22 @@
+<script lang="ts">
+	import { invalidateAll } from "$app/navigation";
+	import { account } from "$lib/appwrite";
+
+	let isCreatingGuest = false;
+
+	async function playAsGuest() {
+		if (isCreatingGuest) return;
+
+		isCreatingGuest = true;
+
+		await account.createAnonymousSession();
+		await invalidateAll();
+
+		isCreatingGuest = false;
+	}
+</script>
+
+
 <div class="text-center py-32 px-4 sm:px-6 lg:px-8">
 	<h1 class="block text-2xl font-bold text-white sm:text-4xl">Welcome, Hero!</h1>
 	<p class="mt-3 text-lg text-gray-300">
@@ -21,11 +40,12 @@
 	</div>
 
 	<div class="mt-4">
-		<a
+		<button
+		disabled={isCreatingGuest}
+		on:click={playAsGuest}
 			class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100 focus:text-neutral-100 focus:outline-none focus:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none"
-			href="https://auth.life-in-skills.almostapps.eu/"
 		>
 			Play as guest
-		</a>
+	</button>
 	</div>
 </div>
