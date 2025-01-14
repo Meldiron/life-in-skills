@@ -5,6 +5,7 @@
 	import SkillActivity from './SkillActivity.svelte';
 	import { hasBonus } from '$lib/skills';
 	import type { Skill } from '$lib/appwrite';
+	import { storeUser } from '$lib/store.svelte';
 
 	interface Props {
 		skill: Skill;
@@ -13,7 +14,7 @@
 
 	let { skill, id }: Props = $props();
 
-	let bonusXp = 1; // TODO: Get from user prefs
+	let bonusXp = storeUser.value.prefs?.dailyBonus ?? 3;
 
 	async function editSkill() {
 		// @ts-ignore
@@ -21,8 +22,11 @@
 	}
 
 	let activityXp = $state(0);
-	async function addActivity(amount: number) {
+	let activityEffortName = $state('');
+	async function addActivity(amount: number, name: string) {
 		activityXp = amount;
+		activityEffortName = name;
+
 		await tick();
 		// @ts-ignore
 		window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.open();
@@ -206,7 +210,7 @@
 
 		<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
 			<button
-				onclick={() => addActivity(1)}
+				onclick={() => addActivity(1, skill.smallXpName)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -221,7 +225,7 @@
 				{/if}
 			</button>
 			<button
-				onclick={() => addActivity(5)}
+				onclick={() => addActivity(5, skill.mediumXpName)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -236,7 +240,7 @@
 				{/if}
 			</button>
 			<button
-				onclick={() => addActivity(10)}
+				onclick={() => addActivity(10, skill.bigXpName)}
 				type="button"
 				class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 			>
@@ -256,4 +260,4 @@
 </div>
 
 <SkillSettings id={`skill-edit-${skill.$id}`} {skill} />
-<SkillActivity id={`skill-activity-${skill.$id}`} amount={activityXp} {skill} />
+<SkillActivity id={`skill-activity-${skill.$id}`} effortName={activityEffortName} amount={activityXp} {skill} />

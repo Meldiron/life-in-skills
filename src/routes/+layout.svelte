@@ -26,10 +26,6 @@
 			name: 'Journey'
 		}
 	];
-
-	afterNavigate(() => {
-		// window.HSStaticMethods.autoInit();
-	});
 </script>
 
 <div class="px-3 sm:p-0 max-w-[30rem] flex flex-col mx-auto size-full">

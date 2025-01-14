@@ -107,7 +107,7 @@ function celebrateLevel() {
 function celebrateSmall() {
 	const count = 50,
 		defaults = {
-			origin: { y: 0.9, x: 0.3 },
+			origin: { y: 0.9, x: 0.5 },
 			zIndex: 999
 		};
 
@@ -138,7 +138,7 @@ function celebrateSmall() {
 function celebrateBig() {
 	const count = 250,
 		defaults = {
-			origin: { y: 0.9, x: 0.6 },
+			origin: { y: 0.9, x: 0.5 },
 			zIndex: 999
 		};
 

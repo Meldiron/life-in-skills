@@ -1,5 +1,12 @@
 import { Client, Account, Databases, type Models, Functions } from 'appwrite';
 
+export type AccountPrefs = {
+	dailyBonus: number;
+	isPublic: boolean;
+	publicPath: string;
+	publicNickname: string;
+} & Models.Preferences;
+
 export type Skill = {
 	name: string;
 	icon: string;

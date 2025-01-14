@@ -70,7 +70,7 @@
 			window.HSOverlay.getInstance('#' + id, true).element.close();
 
 			// @ts-ignore
-			window.HSStaticMethods.autoInit();
+			window.HSOverlay.autoInit();
 
 			newSkillName = '';
 			newSkillEmoji = '';

@@ -8,18 +8,20 @@
 	import { hasBonus } from '$lib/skills';
 	import { toast } from '$lib/toast';
 	import { ID } from 'appwrite';
+	import { storeUser } from '$lib/store.svelte';
 
 	interface Props {
 		id: string;
 		amount: number;
 		skill: Skill;
+		effortName: string;
 	}
 
-	let { amount, skill, id }: Props = $props();
+	let { amount, skill, id, effortName }: Props = $props();
 
 	let activityNote = $state('');
 
-	let bonusXp = 1; // TODO: From user prefs
+	let bonusXp = storeUser.value.prefs?.dailyBonus ?? 3;
 
 	let addingXp = $state(false);
 	async function addXpFinish() {
@@ -44,7 +46,7 @@
 			});
 
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `+${amount} XP in ${skill.name}`,
+				text: `+${amount} XP in ${skill.name} for ${effortName}`,
 				note: activityNote
 			});
 

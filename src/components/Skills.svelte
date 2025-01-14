@@ -14,7 +14,7 @@
 
 	$effect(() => {
 		// @ts-ignore
-		window.HSStaticMethods.autoInit();
+		window.HSOverlay.autoInit();
 	});
 
 	function openNewSkill() {
