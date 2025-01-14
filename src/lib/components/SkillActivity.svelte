@@ -146,7 +146,7 @@
 				<input
 					id="skill-activity-note"
 					type="text"
-					required={true}
+					required={false}
 					bind:value={activityNote}
 					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
 					placeholder="Clean washing machine, Watered garden, Math homework, ..."

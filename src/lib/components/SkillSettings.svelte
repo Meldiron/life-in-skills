@@ -6,13 +6,14 @@
 	import { capitalizeFirstLetter } from '$lib/helpers';
 	import { toast } from '$lib/toast';
 	import { ExecutionMethod, ID } from 'appwrite';
+	import { storeUser } from '$lib/store.svelte';
 
 	interface Props {
 		skill: Skill | null;
 		id: string;
 	}
 
-	let { skill, id }: Props = $props();
+	let { skill, id, user }: Props = $props();
 
 	let newIsEditing = $state(skill ? true : false);
 	let newSkillName = $state(skill ? skill.name : '');
@@ -53,7 +54,8 @@
 					name: newSkillName,
 					reward: newSkillReward,
 					icon: newSkillEmoji ? newSkillEmoji : '❓',
-					targetLevel: newSkillTargetLevel
+					targetLevel: newSkillTargetLevel,
+					userId: storeUser.value.$id
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`

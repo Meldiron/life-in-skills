@@ -2,15 +2,17 @@
 	import type { Skill } from '$lib/appwrite';
 	import { getGraphProgress, getLevel } from '$lib/levels';
 	import SkillSettings from './SkillSettings.svelte';
+	import SkillsTotalLevel from './SkillsTotalLevel.svelte';
 	import { tick } from 'svelte';
 	import SkillDetail from './SkillDetail.svelte';
 	import { hasBonus } from '$lib/skills';
 
 	interface Props {
 		skills: Skill[];
+		admin: boolean;
 	}
 
-	let { skills }: Props = $props();
+	let { skills, admin = false }: Props = $props();
 
 	$effect(() => {
 		// @ts-ignore
@@ -22,16 +24,6 @@
 		window.HSOverlay.getInstance('#skill-edit-new', true).element.open();
 	}
 
-	function getTotalLevel(skills: Skill[]) {
-		let totalLevel = 0;
-
-		for (const skill of skills) {
-			totalLevel += getLevel(skill.xp);
-		}
-
-		return totalLevel;
-	}
-
 	function activateSkill(skill: Skill) {
 		// @ts-ignore
 		window.HSOverlay.getInstance('#skill-detail-' + skill.$id, true).element.open();
@@ -39,12 +31,9 @@
 </script>
 
 <div class="mt-6 grid grid-cols-8 sm:grid-cols-12 gap-3">
-	<div
-		class={`col-span-4 flex flex-col items-center gap-0 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-neutral-950 to-black border-neutral-700 text-neutral-400`}
-	>
-		<p>Total level</p>
-		<h2 class="font-bold text-white text-xl">{getTotalLevel(skills)}</h2>
-	</div>
+	{#if admin}
+		<SkillsTotalLevel {skills} />
+	{/if}
 
 	{#each skills as skill}
 		<button
@@ -75,27 +64,35 @@
 		</button>
 	{/each}
 
-	<button
-		onclick={openNewSkill}
-		class="col-span-4 flex items-center gap-2 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-trasparent border-transparent text-neutral-400"
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="1.5"
-			stroke="currentColor"
-			class="hidden sm:block size-6"
-		>
-			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-		</svg>
+	{#if !admin}
+		<SkillsTotalLevel {skills} />
+	{/if}
 
-		<p>Add skill</p>
-	</button>
+	{#if admin}
+		<button
+			onclick={openNewSkill}
+			class="col-span-4 flex items-center gap-2 justify-center border shadow-sm rounded-lg p-4 md:p-5 bg-trasparent border-transparent text-neutral-400"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				class="hidden sm:block size-6"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+			</svg>
+
+			<p>Add skill</p>
+		</button>
+	{/if}
 </div>
 
-<SkillSettings id="skill-edit-new" skill={null} />
+{#if admin}
+	<SkillSettings id="skill-edit-new" skill={null} />
+{/if}
 
 {#each skills as skill}
-	<SkillDetail id={`skill-detail-${skill.$id}`} {skill} />
+	<SkillDetail id={`skill-detail-${skill.$id}`} {skill} {admin} />
 {/each}

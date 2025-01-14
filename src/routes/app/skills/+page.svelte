@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import Skills from '../../../components/Skills.svelte';
+	import Skills from '$lib/components/Skills.svelte';
 
 	interface Props {
 		data: PageData;
@@ -32,4 +32,4 @@
 	</div>
 </h2>
 
-<Skills skills={data.skills} />
+<Skills skills={data.skills} admin={true} />

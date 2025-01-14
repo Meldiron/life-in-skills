@@ -13,20 +13,13 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const data = await parent();
 
 	async function getCombatData() {
-		const response = await databases.listDocuments<Combat>('main', 'combat', [
-			Query.orderDesc('$id'),
-			Query.limit(1)
-		]);
-
-		if (response.documents[0]) {
-			return response.documents[0];
+		try {
+			return await databases.getDocument<Combat>('main', 'combat', data.user?.$id ?? '');
+		} catch (err) {
+			return await databases.createDocument<Combat>('main', 'combat', data.user?.$id ?? '', {
+				deaths: 0
+			});
 		}
-
-		const creation = await databases.createDocument<Combat>('main', 'combat', ID.unique(), {
-			deaths: 0
-		});
-
-		return creation;
 	}
 
 	async function getCombatActions() {
