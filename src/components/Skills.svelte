@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Skill } from '$lib/appwrite';
 	import { getGraphProgress, getLevel } from '$lib/levels';
-
 	import SkillSettings from './SkillSettings.svelte';
 	import { tick } from 'svelte';
 	import SkillDetail from './SkillDetail.svelte';
@@ -13,13 +12,14 @@
 
 	let { skills }: Props = $props();
 
-	let isCreatingSkill = $state(false);
-	async function openNewSkill() {
-		isCreatingSkill = true;
-		await tick();
-
+	$effect(() => {
 		// @ts-ignore
-		window.HSOverlay.open(document.getElementById('new-skill'));
+		window.HSStaticMethods.autoInit();
+	});
+
+	function openNewSkill() {
+		// @ts-ignore
+		window.HSOverlay.getInstance('#skill-edit-new', true).element.open();
 	}
 
 	function getTotalLevel(skills: Skill[]) {
@@ -32,15 +32,9 @@
 		return totalLevel;
 	}
 
-	let activeSkill: Skill | null = $state(null);
-
-	async function activateSkill(skill: Skill) {
-		activeSkill = skill;
-
-		await tick();
-
+	function activateSkill(skill: Skill) {
 		// @ts-ignore
-		window.HSOverlay.open(document.getElementById('active-skill'));
+		window.HSOverlay.getInstance('#skill-detail-' + skill.$id, true).element.open();
 	}
 </script>
 
@@ -100,10 +94,8 @@
 	</button>
 </div>
 
+<SkillSettings id="skill-edit-new" skill={null} />
 
-	<SkillSettings skill={null} />
-
-
-{#if activeSkill}
-	<SkillDetail skill={activeSkill} />
-{/if}
+{#each skills as skill}
+	<SkillDetail id={`skill-detail-${skill.$id}`} {skill} />
+{/each}

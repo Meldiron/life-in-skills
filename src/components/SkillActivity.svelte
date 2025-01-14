@@ -10,11 +10,12 @@
 	import { ID } from 'appwrite';
 
 	interface Props {
+		id: string;
 		amount: number;
 		skill: Skill;
 	}
 
-	let { amount, skill }: Props = $props();
+	let { amount, skill, id }: Props = $props();
 
 	let activityNote = $state('');
 
@@ -69,10 +70,10 @@
 			}
 
 			// @ts-ignore
-			window.HSOverlay.close(document.getElementById('skill-activity'));
+			window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.close();
 
 			// @ts-ignore
-			window.HSOverlay.open(document.getElementById('active-skill'));
+			window.HSOverlay.getInstance('#skill-detail-' + skill.$id, true).element.open();
 
 			setTimeout(() => {
 				if (amount === 1) {
@@ -98,7 +99,7 @@
 </script>
 
 <div
-	id="skill-activity"
+	{id}
 	class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
 	role="dialog"
 	tabindex="-1"
@@ -116,7 +117,7 @@
 					type="button"
 					class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
 					aria-label="Close"
-					data-hs-overlay="#skill-activity"
+					data-hs-overlay={`#${id}`}
 				>
 					<span class="sr-only">Close</span>
 					<svg

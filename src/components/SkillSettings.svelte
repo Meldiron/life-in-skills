@@ -9,18 +9,19 @@
 
 	interface Props {
 		skill: Skill | null;
+		id: string;
 	}
 
-	let { skill }: Props = $props();
+	let { skill, id }: Props = $props();
 
-	let newIsEditing = $state(false);
-	let newSkillName = $state('');
-	let newSkillReward = $state('');
-	let newSkillEmoji = $state('');
-	let newSkillTargetLevel = $state(10);
-	let newSkillSmallXpName = $state('Quick win');
-	let newSkillMdiumXpName = $state('Regular');
-	let newSkillBigXpName = $state('High effort');
+	let newIsEditing = $state(skill ? true : false);
+	let newSkillName = $state(skill ? skill.name : '');
+	let newSkillReward = $state(skill ? skill.reward : '');
+	let newSkillEmoji = $state(skill ? skill.icon : '');
+	let newSkillTargetLevel = $state(skill ? skill.targetLevel : 10);
+	let newSkillSmallXpName = $state(skill ? skill.smallXpName : 'Quick win');
+	let newSkillMdiumXpName = $state(skill ? skill.mediumXpName : 'Regular');
+	let newSkillBigXpName = $state(skill ? skill.bigXpName : 'High effort');
 
 	let creatingSkill = $state(false);
 	async function onCreateSkill() {
@@ -66,7 +67,8 @@
 			await invalidateAll();
 
 			// @ts-ignore
-			window.HSOverlay.close(document.getElementById('new-skill'));
+			window.HSOverlay.getInstance('#' + id, true).element.close();
+
 			// @ts-ignore
 			window.HSStaticMethods.autoInit();
 
@@ -98,9 +100,10 @@
 				text: `Deleted ${capitalizeFirstLetter(newSkillName)} skill`
 			});
 
-			await invalidateAll();
 			// @ts-ignore
-			window.HSOverlay.close(document.getElementById('new-skill'));
+			window.HSOverlay.getInstance('#' + id, true).element.close();
+
+			await invalidateAll();
 			toast.open({
 				type: 'log',
 				message: 'Skill successfully created'
@@ -258,7 +261,7 @@
 </script>
 
 <div
-	id="new-skill"
+	{id}
 	class="hs-overlay hs-overlay-open:translate-x-0 hidden translate-x-full fixed top-0 end-0 transition-all duration-300 transform h-full max-w-sm w-full z-[80] bg-white border-s dark:bg-neutral-800 dark:border-neutral-700"
 	role="dialog"
 	tabindex="-1"
@@ -271,7 +274,7 @@
 			type="button"
 			class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
 			aria-label="Close"
-			data-hs-overlay="#new-skill"
+			data-hs-overlay={`#${id}`}
 		>
 			<span class="sr-only">Close</span>
 			<svg

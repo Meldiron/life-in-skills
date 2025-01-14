@@ -1,8 +1,7 @@
 <script lang="ts">
 	import * as Overlay from '@preline/overlay';
-
-	import '../app.css';
 	import { afterNavigate } from '$app/navigation';
+	import '../app.css';
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
 
@@ -29,8 +28,7 @@
 	];
 
 	afterNavigate(() => {
-		// @ts-ignore
-		window.HSStaticMethods.autoInit();
+		// window.HSStaticMethods.autoInit();
 	});
 </script>
 

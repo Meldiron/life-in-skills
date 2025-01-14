@@ -8,35 +8,31 @@
 
 	interface Props {
 		skill: Skill;
+		id: string;
 	}
 
-	let { skill }: Props = $props();
+	let { skill, id }: Props = $props();
 
 	let bonusXp = 1; // TODO: Get from user prefs
 
-	let isEditing = $state(false);
 	async function editSkill() {
-		isEditing = true;
-		await tick();
 		// @ts-ignore
-		window.HSOverlay.open(document.getElementById('new-skill'));
+		window.HSOverlay.getInstance('#skill-edit-' + skill.$id, true).element.open();
 	}
 
-	let isAddingActivity = $state(false);
 	let activityXp = $state(0);
 	async function addActivity(amount: number) {
 		activityXp = amount;
-		isAddingActivity = true;
 		await tick();
 		// @ts-ignore
-		window.HSOverlay.open(document.getElementById('skill-activity'));
+		window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.open();
 		await tick();
 		document.getElementById('skill-activity-note')?.focus();
 	}
 </script>
 
 <div
-	id="active-skill"
+	{id}
 	class="overflow-y-auto mx-auto max-w-[30rem] p-4 rounded-t-xl hs-overlay hs-overlay-open:translate-y-0 translate-y-full fixed bottom-0 inset-x-0 transition-all duration-300 transform max-h-[90%] h-[fit-content] size-full z-[80] bg-neutral-950"
 	role="dialog"
 	tabindex="-1"
@@ -47,10 +43,7 @@
 				<span>{skill.icon ?? ''}</span>
 			</div>
 			<div>
-				<h3
-					id="hs-offcanvas-bottom-label"
-					class="line-clamp-1 font-bold text-gray-800 text-xl dark:text-white"
-				>
+				<h3 class="line-clamp-1 font-bold text-gray-800 text-xl dark:text-white">
 					{skill.name ?? ''}
 				</h3>
 
@@ -89,7 +82,7 @@
 				type="button"
 				class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:focus:bg-neutral-700"
 				aria-label="Close"
-				data-hs-overlay="#active-skill"
+				data-hs-overlay={`#${id}`}
 			>
 				<span class="sr-only">Close</span>
 				<svg
@@ -262,8 +255,5 @@
 	</div>
 </div>
 
-<SkillSettings {skill} />
-
-{#if isAddingActivity}
-	<SkillActivity amount={activityXp} {skill} />
-{/if}
+<SkillSettings id={`skill-edit-${skill.$id}`} {skill} />
+<SkillActivity id={`skill-activity-${skill.$id}`} amount={activityXp} {skill} />

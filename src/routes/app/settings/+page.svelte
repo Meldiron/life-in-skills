@@ -91,7 +91,7 @@
 	// Daily bonus
 	let dailyBonus2 = $derived(data.user?.prefs?.dailyBonus ?? 3);
 	let dailyBonus = $state(dailyBonus2);
-	
+
 	let originalDailyBonus = $derived(data.user?.prefs?.dailyBonus ?? 3);
 	let madeDailyBonusChanges = $derived(dailyBonus !== originalDailyBonus);
 
