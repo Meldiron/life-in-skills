@@ -15,7 +15,7 @@
 
 	let { skill, id, admin = false }: Props = $props();
 
-	let bonusXp = storeUser.value.prefs?.dailyBonus ?? 3;
+	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
 
 	async function editSkill() {
 		// @ts-ignore

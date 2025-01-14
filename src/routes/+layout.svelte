@@ -26,6 +26,11 @@
 			name: 'Journey'
 		}
 	];
+
+	$effect(() => {
+		// @ts-ignore
+		window.HSCollapse.autoInit();
+	});
 </script>
 
 <div class="px-3 sm:p-0 max-w-[30rem] flex flex-col mx-auto size-full">
@@ -103,7 +108,7 @@
 
 						<a
 							aria-label="Settings"
-							class="font-medium bg-neutral-800 rounded-full p-1.5 text-white/70 hover:text-white focus:outline-none focus:text-white"
+							class="w-[fit-content] font-medium bg-neutral-800 rounded-full p-1.5 text-white/70 hover:text-white focus:outline-none focus:text-white"
 							href="/app/settings"
 						>
 							<svg

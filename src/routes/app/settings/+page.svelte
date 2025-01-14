@@ -247,7 +247,7 @@
 			{#if hasProfileOnInit}
 				<div class="inline-flex items-center gap-x-2">
 					<a
-						href={`https://life-in-skills.almostapps.eu/hero/${publicPath}`}
+						href={`${window.location.origin}/hero/${publicPath}`}
 						target="_blank"
 						class="relative"
 					>

@@ -13,13 +13,13 @@
 
 	let { data = $bindable() }: Props = $props();
 
-	let days: any = $state([]);
+	let days: any[] = $state([]);
 
 	function syncDays(data: PageData) {
 		for (const activity of data.activities) {
 			const dateKey = moment.default(activity.$createdAt).format('YYYY-MM-DD');
 
-			let daysDate = days.find((day: any) => day.date === dateKey);
+			let daysDate = days.find((day) => day.date === dateKey);
 			if (!daysDate) {
 				days.push({
 					date: dateKey,
@@ -27,7 +27,7 @@
 				});
 			}
 
-			daysDate = days.find((day: any) => day.date === dateKey);
+			daysDate = days.find((day) => day.date === dateKey);
 
 			const existingActivity = daysDate.activities.find((a: any) => a.$id === activity.$id);
 			if (existingActivity) {
@@ -37,7 +37,7 @@
 			daysDate.activities.push(activity);
 		}
 
-		days = days.sort((a: any, b: any) => {
+		days = days.sort((a, b) => {
 			return moment.default(b.date).unix() > moment.default(a.date).unix() ? 1 : -1;
 		});
 	}

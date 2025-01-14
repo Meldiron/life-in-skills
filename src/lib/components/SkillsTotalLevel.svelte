@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getLevel } from '$lib/levels';
+	import { type Skill } from '$lib/appwrite';
 
 	interface Props {
 		skills: Skill[];

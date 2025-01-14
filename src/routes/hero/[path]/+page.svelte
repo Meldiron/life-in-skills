@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Skills from '$lib/components/Skills.Svelte';
-	import CombatHealth from '$lib/components/CombatHealth.Svelte';
+	import Skills from '$lib/components/Skills.svelte';
+	import CombatHealth from '$lib/components/CombatHealth.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {

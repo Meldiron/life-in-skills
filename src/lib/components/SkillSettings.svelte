@@ -13,7 +13,7 @@
 		id: string;
 	}
 
-	let { skill, id, user }: Props = $props();
+	let { skill, id }: Props = $props();
 
 	let newIsEditing = $state(skill ? true : false);
 	let newSkillName = $state(skill ? skill.name : '');
@@ -55,7 +55,7 @@
 					reward: newSkillReward,
 					icon: newSkillEmoji ? newSkillEmoji : '❓',
 					targetLevel: newSkillTargetLevel,
-					userId: storeUser.value.$id
+					userId: storeUser?.value?.$id ?? ''
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`
@@ -120,7 +120,7 @@
 		}
 	}
 
-	let usedEmojis: any = {};
+	let usedEmojis: { [key: string]: string[] } = {};
 	let generatingEmoji = $state(false);
 	async function generateEmoji() {
 		if (generatingEmoji) {

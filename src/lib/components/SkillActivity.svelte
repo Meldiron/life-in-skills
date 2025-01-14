@@ -21,7 +21,7 @@
 
 	let activityNote = $state('');
 
-	let bonusXp = storeUser.value.prefs?.dailyBonus ?? 3;
+	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
 
 	let addingXp = $state(false);
 	async function addXpFinish() {
