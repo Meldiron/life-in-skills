@@ -39,15 +39,16 @@
 			return;
 		}
 
+		let bonusXpToAdd = 0;
 		if (hasBonus(skill) && bonusXp > 0) {
-			amount += bonusXp;
+			bonusXpToAdd = bonusXp;
 		}
 
 		addingXp = true;
 
 		try {
 			const oldXp = skill.xp;
-			skill.xp = skill.xp + amount;
+			skill.xp = skill.xp + amount + bonusXpToAdd;
 			skill.lastActivityAt = new Date().toISOString();
 
 			await databases.updateDocument<Skill>('main', 'skills', skill.$id, {
@@ -56,7 +57,7 @@
 			});
 
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `+${amount} XP in ${skill.name} for ${effortName}`,
+				text: `+${amount + bonusXpToAdd} XP in ${skill.name} for ${effortName}`,
 				note: activityNote,
 				icon: skill.icon
 			});
