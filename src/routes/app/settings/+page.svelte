@@ -246,11 +246,7 @@
 
 			{#if hasProfileOnInit}
 				<div class="inline-flex items-center gap-x-2">
-					<a
-						href={`${window.location.origin}/hero/${publicPath}`}
-						target="_blank"
-						class="relative"
-					>
+					<a href={`${window.location.origin}/hero/${publicPath}`} target="_blank" class="relative">
 						<span
 							class="py-1 px-2 inline-flex items-center gap-x-1 text-xs font-medium rounded-full hover:bg-blue-700 bg-blue-600 text-white"
 						>

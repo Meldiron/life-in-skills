@@ -17,9 +17,19 @@
 		effortName: string;
 	}
 
-	let { amount, skill, id, effortName }: Props = $props();
+	let { amount = $bindable(0), skill, id, effortName }: Props = $props();
 
 	let activityNote = $state('');
+
+	let experienceShowCustom = $state(false);
+
+	$effect(() => {
+		if (amount >= 10 && !experienceShowCustom) {
+			experienceShowCustom = true;
+		}
+	});
+
+	let size = $state(amount === 1 ? 'small' : amount === 5 ? 'medium' : 'big');
 
 	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
 
@@ -47,7 +57,8 @@
 
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 				text: `+${amount} XP in ${skill.name} for ${effortName}`,
-				note: activityNote
+				note: activityNote,
+				icon: skill.icon
 			});
 
 			const previousLevel = getLevel(oldXp);
@@ -55,7 +66,8 @@
 
 			if (previousLevel !== nextLevel) {
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-					text: `${capitalizeFirstLetter(skill.name)} leveled up to ${nextLevel}`
+					text: `${capitalizeFirstLetter(skill.name)} leveled up to ${nextLevel}`,
+					icon: skill.icon
 				});
 
 				await invalidateAll();
@@ -78,17 +90,19 @@
 			window.HSOverlay.getInstance('#skill-detail-' + skill.$id, true).element.open();
 
 			setTimeout(() => {
-				if (amount === 1) {
+				if (size === 'small') {
 					// @ts-ignore
 					celebrateSmall();
-				} else if (amount === 5) {
+				} else if (size === 'medium') {
 					// @ts-ignore
 					celebrateMedium();
-				} else if (amount === 10) {
+				} else if (size === 'big') {
 					// @ts-ignore
 					celebrateBig();
 				}
 			}, 300);
+
+			activityNote = '';
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -140,13 +154,52 @@
 				</button>
 			</div>
 			<div class="p-4 overflow-y-auto">
+				<label for="input-label" class="mb-2 block text-sm font-medium dark:text-white">
+					{#if !experienceShowCustom}
+						<span class="mr-0.5 font-bold text-white rounded-xl bg-neutral-900 px-3 py-1"
+							>{amount}</span
+						>
+					{/if}
+					<span>Experience</span>
+				</label>
+				<input
+					bind:value={amount}
+					type="range"
+					class="w-full bg-transparent cursor-pointer appearance-none disabled:opacity-50 disabled:pointer-events-none focus:outline-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:-mt-0.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(37,99,235,1)] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:dark:bg-neutral-700 [&::-moz-range-thumb]:w-2.5 [&::-moz-range-thumb]:h-2.5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-blue-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-webkit-slider-runnable-track]:w-full [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:bg-gray-100 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:dark:bg-neutral-700 [&::-moz-range-track]:w-full [&::-moz-range-track]:h-2 [&::-moz-range-track]:bg-gray-100 [&::-moz-range-track]:rounded-full"
+					aria-orientation="horizontal"
+					min="1"
+					max="10"
+					step="1"
+				/>
+
+				{#if experienceShowCustom}
+					<input
+						type="number"
+						required={true}
+						bind:value={amount}
+						class="mt-1.5 py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
+						placeholder="Enter custom amount"
+					/>
+				{/if}
+			</div>
+			<div class="p-4 overflow-y-auto">
 				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
-					>What were you doing?</label
+					>Effort</label
 				>
 				<input
-					id="skill-activity-note"
+					type="text"
+					required={true}
+					bind:value={effortName}
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
+					placeholder="Clean washing machine, Watered garden, Math homework, ..."
+				/>
+			</div>
+			<div class="p-4 overflow-y-auto">
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white">Note</label>
+				<input
 					type="text"
 					required={false}
+					autofocus={true}
 					bind:value={activityNote}
 					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
 					placeholder="Clean washing machine, Watered garden, Math homework, ..."
@@ -155,19 +208,10 @@
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
 				<button
 					disabled={addingXp}
-					onclick={addXpFinish}
-					type="button"
-					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
-					data-hs-overlay="#hs-focus-management-modal"
-				>
-					Skip
-				</button>
-				<button
-					disabled={addingXp}
 					type="submit"
 					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
 				>
-					Save details
+					Submit
 				</button>
 			</div>
 		</form>

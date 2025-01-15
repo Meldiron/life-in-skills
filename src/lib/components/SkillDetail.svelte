@@ -15,6 +15,10 @@
 
 	let { skill, id, admin = false }: Props = $props();
 
+	let remainingXp = $derived(
+		getXp(skill.targetLevel ? skill.targetLevel - 1 : 0) - (skill.xp ?? 0)
+	);
+
 	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
 
 	async function editSkill() {
@@ -31,8 +35,6 @@
 		await tick();
 		// @ts-ignore
 		window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.open();
-		await tick();
-		document.getElementById('skill-activity-note')?.focus();
 	}
 </script>
 
@@ -53,7 +55,9 @@
 				</h3>
 
 				{#if admin}
-					<p class="text-sm text-neutral-500 line-clamp-1">
+					<p
+						class={`text-sm ${remainingXp <= 0 ? 'text-green-500' : 'text-neutral-500'} line-clamp-1`}
+					>
 						{skill.reward ?? 'No reward set yet'}
 					</p>
 				{/if}
@@ -113,6 +117,40 @@
 		</div>
 	</div>
 	<div class="p-4">
+		{#if admin && skill.reward && remainingXp <= 0}
+			<div
+				class="mb-4 -mt-2 bg-green-50 border border-green-200 text-sm text-green-800 rounded-lg p-4 dark:bg-green-800/10 dark:border-green-900 dark:text-green-500"
+				role="alert"
+				tabindex="-1"
+				aria-labelledby="hs-with-description-label"
+			>
+				<div class="flex">
+					<div class="shrink-0">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							class="shrink-0 size-6 mt-0.5"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</div>
+					<div class="ms-4">
+						<h3 id="hs-with-description-label" class="text-sm font-semibold">
+							Target level achieved!
+						</h3>
+						<div class="mt-1 text-sm text-green-700">
+							Provide yourself with reward, and edit skill to set a new challanging target level,
+							and it's reward.
+						</div>
+					</div>
+				</div>
+			</div>
+		{/if}
 		<div class="grid grid-cols-6 sm:grid-cols-12 gap-4">
 			<div class="col-span-6 flex justify-center">
 				<!-- Gauge Component -->
@@ -200,7 +238,7 @@
 						<div class="w-full flex justify-between truncate items-center">
 							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Remaining XP </span>
 							<button type="button" class="flex items-center gap-x-2">
-								{getXp(skill.targetLevel ?? 0) - (skill.xp ?? 0)}
+								{remainingXp <= 0 ? 'None' : remainingXp}
 							</button>
 						</div>
 					</li>

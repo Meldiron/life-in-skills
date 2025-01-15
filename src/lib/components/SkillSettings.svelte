@@ -173,20 +173,20 @@
 			title: 'Build a new habit',
 			description: 'approx. 2 weeks to complete'
 		},
+		'30': {
+			level: 30,
+			title: 'Reinforced a habbit',
+			description: 'approx. 2 to 4 months to complete'
+		},
 		'40': {
 			level: 40,
-			title: 'Reinforced a habbit',
+			title: 'Train a skill',
 			description: 'approx. 4 to 6 months to complete'
 		},
 		'50': {
 			level: 50,
-			title: 'Train a skill',
-			description: 'approx. 1 year to complete'
-		},
-		'80': {
-			level: 80,
 			title: 'Become professional',
-			description: 'approx. 2 to 3 years to complete'
+			description: 'approx. 1 year to complete'
 		},
 		'99': {
 			level: 99,
@@ -463,7 +463,7 @@
 			<div>
 				<div class="flex justify-between items-center">
 					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>Quick win action (+1XP)</label
+						>Quick win activity (+1XP)</label
 					>
 					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1-5 min effort</span>
 				</div>
@@ -478,7 +478,7 @@
 			<div>
 				<div class="flex justify-between items-center">
 					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>Regular action (+5XP)</label
+						>Regular activity (+5XP)</label
 					>
 
 					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Focused session</span
@@ -495,7 +495,7 @@
 			<div>
 				<div class="flex justify-between items-center">
 					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>High effort action (+10 XP)</label
+						>High effort activity (+10 XP)</label
 					>
 					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1+ hours effort</span
 					>

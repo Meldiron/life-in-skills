@@ -33,6 +33,7 @@ export type CombatAction = {
 export type Activity = {
 	text: string;
 	note: string;
+	icon: string;
 } & Models.Document;
 
 export type PublicProfile = {
