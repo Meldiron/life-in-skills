@@ -253,52 +253,76 @@
 			<div class="block sm:hidden mt-6"></div>
 
 			<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
-				<button
-					onclick={() => addActivity(1, skill.smallXpName)}
-					type="button"
-					class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-				>
-					<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-						<p class="text-neutral-400 line-clamp-1">{skill.smallXpName}</p>
-						<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
-					</div>
-					{#if hasBonus(skill) && bonusXp > 0}
-						<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-							+{bonusXp}XP bonus
-						</p>
-					{/if}
-				</button>
-				<button
-					onclick={() => addActivity(5, skill.mediumXpName)}
-					type="button"
-					class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-				>
-					<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-						<p class="text-neutral-200 line-clamp-1">{skill.mediumXpName}</p>
-						<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
-					</div>
-					{#if hasBonus(skill) && bonusXp > 0}
-						<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-							+{bonusXp}XP bonus
-						</p>
-					{/if}
-				</button>
-				<button
-					onclick={() => addActivity(10, skill.bigXpName)}
-					type="button"
-					class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-				>
-					<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-						<p class="text-[#e18f49] line-clamp-1">{skill.bigXpName}</p>
-						<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
-					</div>
+				{#if !skill.smallXpName && !skill.mediumXpName && !skill.bigXpName}
+					<button
+						onclick={() => addActivity(1, 'Activity')}
+						type="button"
+						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+					>
+						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+							<p class="text-neutral-400 line-clamp-1">Activity</p>
+							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
+						</div>
+						{#if hasBonus(skill) && bonusXp > 0}
+							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+								+{bonusXp}XP bonus
+							</p>
+						{/if}
+					</button>
+				{/if}
 
-					{#if hasBonus(skill) && bonusXp > 0}
-						<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-							+{bonusXp}XP bonus
-						</p>
-					{/if}
-				</button>
+				{#if skill.smallXpName}
+					<button
+						onclick={() => addActivity(1, skill.smallXpName)}
+						type="button"
+						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+					>
+						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+							<p class="text-neutral-400 line-clamp-1">{skill.smallXpName}</p>
+							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
+						</div>
+						{#if hasBonus(skill) && bonusXp > 0}
+							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+								+{bonusXp}XP bonus
+							</p>
+						{/if}
+					</button>
+				{/if}
+				{#if skill.mediumXpName}
+					<button
+						onclick={() => addActivity(5, skill.mediumXpName)}
+						type="button"
+						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+					>
+						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+							<p class="text-neutral-200 line-clamp-1">{skill.mediumXpName}</p>
+							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
+						</div>
+						{#if hasBonus(skill) && bonusXp > 0}
+							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+								+{bonusXp}XP bonus
+							</p>
+						{/if}
+					</button>
+				{/if}
+				{#if skill.bigXpName}
+					<button
+						onclick={() => addActivity(10, skill.bigXpName)}
+						type="button"
+						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+					>
+						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+							<p class="text-[#e18f49] line-clamp-1">{skill.bigXpName}</p>
+							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
+						</div>
+
+						{#if hasBonus(skill) && bonusXp > 0}
+							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+								+{bonusXp}XP bonus
+							</p>
+						{/if}
+					</button>
+				{/if}
 			</div>
 		{/if}
 	</div>
