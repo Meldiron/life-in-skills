@@ -2,7 +2,7 @@
 	import { preventDefault } from 'svelte/legacy';
 
 	import { invalidateAll } from '$app/navigation';
-	import { databases, type Activity, type Skill } from '$lib/appwrite';
+	import { databases, type Activity, type Skill, account } from '$lib/appwrite';
 	import { capitalizeFirstLetter } from '$lib/helpers';
 	import { getLevel } from '$lib/levels';
 	import { hasBonus } from '$lib/skills';
@@ -17,7 +17,7 @@
 		effortName: string;
 	}
 
-	let { amount = $bindable(0), skill, id, effortName }: Props = $props();
+	let { amount = $bindable(0), skill, id, effortName = $bindable(0) }: Props = $props();
 
 	let activityNote = $state('');
 
@@ -32,6 +32,33 @@
 	let size = $state(amount === 1 ? 'small' : amount === 5 ? 'medium' : 'big');
 
 	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
+
+	let presets = $derived([
+		{
+			amount: 1,
+			effortName: "Custom",
+			note: ""
+		},
+		...((JSON.parse(storeUser.value?.prefs?.presets ?? '{}'))[skill.$id] ?? [])
+	]);
+
+	let activePreset = $state('Custom');
+
+	function activatePreset(preset: any) {
+		amount = preset.amount;
+		effortName = preset.effortName === 'Custom' ? '' : preset.effortName;
+		activityNote = preset.note;
+
+		activePreset = preset.effortName;
+	}
+
+	$effect(() => {
+		const presetEffortName = presets.find(preset => preset.effortName === activePreset)?.effortName ?? '';
+		console.log(presetEffortName);
+		if (presetEffortName !== effortName) {
+			activePreset = 'Custom';
+		}
+	});
 
 	let addingXp = $state(false);
 	async function addXpFinish() {
@@ -104,6 +131,9 @@
 			}, 300);
 
 			activityNote = '';
+			effortName = '';
+			activePreset = 'Custom';
+			amount = 1;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -111,6 +141,50 @@
 			});
 		} finally {
 			addingXp = false;
+		}
+	}
+
+	let addingPreset = $state(false);
+	async function addPreset() {
+		if (!skill || addingPreset) {
+			return;
+		}
+
+		addingPreset = true;
+
+		try {
+			const originalPrefs = await account.getPrefs();
+			const presets = JSON.parse(originalPrefs.presets ?? '{}');
+			if(!presets[skill.$id]) {
+				presets[skill.$id] = [];
+			}
+
+			presets[skill.$id].push({
+				amount,
+				effortName,
+				note: activityNote
+			});
+
+			await account.updatePrefs({
+				...originalPrefs,
+				presets: JSON.stringify(presets)
+			});
+
+			await invalidateAll();
+
+			toast.open({
+				type: 'success',
+				message: `Activity preset saved.`
+			});
+
+			activePreset = effortName;
+		} catch (err: any) {
+			toast.open({
+				type: 'error',
+				message: err.message ? err.message : err.toString()
+			});
+		} finally {
+			addingPreset = false;
 		}
 	}
 </script>
@@ -129,7 +203,7 @@
 			class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70"
 		>
 			<div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
-				<h3 class="font-bold text-gray-800 dark:text-white">Activity</h3>
+				<h3 class="font-bold text-gray-800 dark:text-white">Add Experience</h3>
 				<button
 					type="button"
 					class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
@@ -154,6 +228,68 @@
 					</svg>
 				</button>
 			</div>
+
+			{#if presets.length > 1}
+			<div class="p-4 pb-0 overflow-y-auto">
+			
+				<div class="flex overflow-x-auto">
+					<div
+					class="flex bg-gray-100 hover:bg-gray-200 rounded-lg transition p-1 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+				>
+					{#each presets as preset}
+					
+								<nav
+									class="flex gap-x-1"
+									aria-label="Tabs"
+									role="tablist"
+									aria-orientation="horizontal"
+								>
+									<button
+										onclick={() => activatePreset(preset)}
+										type="button"
+										class={`py-1.5 px-2 inline-flex items-center gap-x-2 bg-transparent text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 font-medium rounded-lg hover:hover:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-white dark:focus:text-white active ${preset.effortName === activePreset ? 'bg-white text-gray-700 dark:bg-neutral-800 text-neutral-400 bg-gray-800' : ''}`}
+										aria-selected={true}
+										role="tab"
+									>
+										{preset.effortName.length > 10 ? preset.effortName.substring(0, 10) + '...' : preset.effortName}
+									</button>
+								</nav>
+					
+					{/each}
+				</div>
+				</div>
+				
+
+			</div>
+			{/if}
+
+			<div class="p-4 overflow-y-auto">
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
+					>Activity <span class="text-neutral-400 text-xs">(optional)</span></label
+				>
+				<input
+					type="text"
+					required={false}
+					autofocus={true}
+					bind:value={effortName}
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
+					placeholder="Clean washing machine, Watered garden, Math homework, ..."
+				/>
+			</div>
+
+		
+			
+			<div class="p-4 overflow-y-auto">
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white">Note <span class="text-neutral-400 text-xs">(optional)</span></label>
+				<input
+					type="text"
+					required={false}
+					bind:value={activityNote}
+					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
+					placeholder="Clean washing machine, Watered garden, Math homework, ..."
+				/>
+			</div>
+
 			<div class="p-4 overflow-y-auto">
 				<label for="input-label" class="mb-2 block text-sm font-medium dark:text-white">
 					{#if !experienceShowCustom}
@@ -183,30 +319,16 @@
 					/>
 				{/if}
 			</div>
-			<div class="p-4 overflow-y-auto">
-				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
-					>Effort</label
-				>
-				<input
-					type="text"
-					required={true}
-					bind:value={effortName}
-					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
-					placeholder="Clean washing machine, Watered garden, Math homework, ..."
-				/>
-			</div>
-			<div class="p-4 overflow-y-auto">
-				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white">Note</label>
-				<input
-					type="text"
-					required={false}
-					autofocus={true}
-					bind:value={activityNote}
-					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
-					placeholder="Clean washing machine, Watered garden, Math homework, ..."
-				/>
-			</div>
+
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
+				<button
+					disabled={addingPreset || (!effortName)}
+					onclick={addPreset}
+					type="button"
+					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+				>
+					Save as preset
+				</button>
 				<button
 					disabled={addingXp}
 					type="submit"

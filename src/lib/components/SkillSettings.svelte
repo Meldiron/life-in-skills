@@ -20,9 +20,6 @@
 	let newSkillReward = $state(skill ? skill.reward : '');
 	let newSkillEmoji = $state(skill ? skill.icon : '');
 	let newSkillTargetLevel = $state(skill ? skill.targetLevel : 10);
-	let newSkillSmallXpName = $state(skill ? skill.smallXpName : 'Quick win');
-	let newSkillMdiumXpName = $state(skill ? skill.mediumXpName : 'Regular');
-	let newSkillBigXpName = $state(skill ? skill.bigXpName : 'High effort');
 
 	let creatingSkill = $state(false);
 	async function onCreateSkill() {
@@ -37,10 +34,7 @@
 					name: newSkillName,
 					reward: newSkillReward,
 					icon: newSkillEmoji ? newSkillEmoji : '❓',
-					targetLevel: newSkillTargetLevel,
-					smallXpName: newSkillSmallXpName,
-					mediumXpName: newSkillMdiumXpName,
-					bigXpName: newSkillBigXpName
+					targetLevel: newSkillTargetLevel
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `Updated ${capitalizeFirstLetter(newSkillName)} skill`
@@ -458,56 +452,6 @@
 				placeholder="Buy new shoes, Day off, +1 month of Netflix, ..."
 			/>
 		</div>
-
-		{#if newIsEditing}
-			<div>
-				<div class="flex justify-between items-center">
-					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>Quick win activity (+1XP)</label
-					>
-					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1-5 min effort</span>
-				</div>
-				<input
-					bind:value={newSkillSmallXpName}
-					type="text"
-					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-					placeholder="Read 1 page, Drink 1 glass of water, Do 10 push-ups, ..."
-				/>
-			</div>
-
-			<div>
-				<div class="flex justify-between items-center">
-					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>Regular activity (+5XP)</label
-					>
-
-					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">Focused session</span
-					>
-				</div>
-				<input
-					bind:value={newSkillMdiumXpName}
-					type="text"
-					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-					placeholder="Do 50 push-ups, Read a chapter, write 500 words, ..."
-				/>
-			</div>
-
-			<div>
-				<div class="flex justify-between items-center">
-					<label for="with-corner-hint" class="block text-sm font-medium mb-2 dark:text-white"
-						>High effort activity (+10 XP)</label
-					>
-					<span class="block mb-2 text-sm text-gray-500 dark:text-neutral-500">1+ hours effort</span
-					>
-				</div>
-				<input
-					bind:value={newSkillBigXpName}
-					type="text"
-					class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-					placeholder="Go to gym, Write an article, Release a new feature, ..."
-				/>
-			</div>
-		{/if}
 
 		<div class="flex flex-col sm:flex-row gap-2">
 			<button

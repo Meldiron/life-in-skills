@@ -46,7 +46,7 @@
 >
 	<div class="flex justify-between items-center py-2 px-4">
 		<div class="flex gap-2 items-center gap-3">
-			<div class="bg-neutral-800 py-2 px-3 text-2xl rounded-xl h-[fit-content]">
+			<div class="bg-neutral-800 text-neutral-400 text-center min-w-[45px] py-2 px-3 text-2xl rounded-xl h-[fit-content]">
 				<span>{skill.icon ?? ''}</span>
 			</div>
 			<div>
@@ -56,7 +56,7 @@
 
 				{#if admin}
 					<p
-						class={`text-sm ${remainingXp <= 0 ? 'text-green-500' : 'text-neutral-500'} line-clamp-1`}
+						class={`text-sm ${remainingXp <= 0 ? 'text-green-500' : 'text-green-500'} line-clamp-1`}
 					>
 						{skill.reward ?? 'No reward set yet'}
 					</p>
@@ -206,7 +206,7 @@
 						class="flex items-center gap-x-2 p-3 py-1.5 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
-							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Current level </span>
+							<span class="me-3 flex-1 w-0 truncate text-white"> Current level </span>
 							<button type="button" class="flex items-center text-lg gap-x-2 font-semibold">
 								{getLevel(skill.xp ?? 0)}
 							</button>
@@ -216,27 +216,27 @@
 						class="flex items-center gap-x-2 p-3 py-1.5 text-sm bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
-							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Target level </span>
+							<span class="me-3 flex-1 w-0 truncate text-white"> Target level </span>
 							<button type="button" class="flex items-center text-lg gap-x-2 font-semibold">
 								{skill.targetLevel ?? 0}
 							</button>
 						</div>
 					</li>
 					<li
-						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border-t-none border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
-							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Total XP </span>
+							<span class="me-3 flex-1 w-0 truncate text-white"> Total XP </span>
 							<button type="button" class="flex items-center gap-x-2">
 								{skill.xp ?? 0}
 							</button>
 						</div>
 					</li>
 					<li
-						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-200"
+						class="flex items-center gap-x-2 p-3 py-2 text-xs bg-white border text-gray-800 first:rounded-t-lg first:mt-0 last:rounded-b-md dark:bg-green-950 dark:border-green-800 dark:text-neutral-200"
 					>
 						<div class="w-full flex justify-between truncate items-center">
-							<span class="me-3 flex-1 w-0 truncate text-neutral-400"> Remaining XP </span>
+							<span class="me-3 flex-1 w-0 truncate text-green-500"> Remaining XP </span>
 							<button type="button" class="flex items-center gap-x-2">
 								{remainingXp <= 0 ? 'None' : remainingXp}
 							</button>
@@ -252,77 +252,21 @@
 
 			<div class="block sm:hidden mt-6"></div>
 
-			<div class="grid grid-cols-4 sm:grid-cols-12 gap-3 sm:gap-0 rounded-lg w-full">
-				{#if !skill.smallXpName && !skill.mediumXpName && !skill.bigXpName}
-					<button
-						onclick={() => addActivity(1, 'Activity')}
-						type="button"
-						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-					>
-						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-							<p class="text-neutral-400 line-clamp-1">Activity</p>
-							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
-						</div>
-						{#if hasBonus(skill) && bonusXp > 0}
-							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-								+{bonusXp}XP bonus
-							</p>
-						{/if}
-					</button>
-				{/if}
-
-				{#if skill.smallXpName}
-					<button
-						onclick={() => addActivity(1, skill.smallXpName)}
-						type="button"
-						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-					>
-						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-							<p class="text-neutral-400 line-clamp-1">{skill.smallXpName}</p>
-							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+1</span> XP</p>
-						</div>
-						{#if hasBonus(skill) && bonusXp > 0}
-							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-								+{bonusXp}XP bonus
-							</p>
-						{/if}
-					</button>
-				{/if}
-				{#if skill.mediumXpName}
-					<button
-						onclick={() => addActivity(5, skill.mediumXpName)}
-						type="button"
-						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-					>
-						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-							<p class="text-neutral-200 line-clamp-1">{skill.mediumXpName}</p>
-							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+5</span> XP</p>
-						</div>
-						{#if hasBonus(skill) && bonusXp > 0}
-							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-								+{bonusXp}XP bonus
-							</p>
-						{/if}
-					</button>
-				{/if}
-				{#if skill.bigXpName}
-					<button
-						onclick={() => addActivity(10, skill.bigXpName)}
-						type="button"
-						class="rounded-lg sm:rounded-none py-3 px-4 col-span-4 inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
-					>
-						<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
-							<p class="text-[#e18f49] line-clamp-1">{skill.bigXpName}</p>
-							<p class="text-white text-xs flex-shrink-0"><span class="text-lg">+10</span> XP</p>
-						</div>
-
-						{#if hasBonus(skill) && bonusXp > 0}
-							<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
-								+{bonusXp}XP bonus
-							</p>
-						{/if}
-					</button>
-				{/if}
+			<div class="rounded-lg w-full">
+				<button
+					onclick={() => addActivity(1, '')}
+					type="button"
+					class="rounded-lg sm:rounded-none py-3 px-4 w-full inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
+				>
+					<div class="flex sm:flex-col gap-3 sm:gap-0 items-center">
+						<p class="text-neutral-400 line-clamp-1">Add XP</p>
+					</div>
+					{#if hasBonus(skill) && bonusXp > 0}
+						<p class="mt-1.5 text-xs px-1.5 py-0.5 bg-neutral-800 text-neutral-400 rounded-full">
+							+{bonusXp}XP bonus
+						</p>
+					{/if}
+				</button>
 			</div>
 		{/if}
 	</div>
