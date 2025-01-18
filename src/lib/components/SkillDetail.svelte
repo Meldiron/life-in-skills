@@ -44,9 +44,13 @@
 	role="dialog"
 	tabindex="-1"
 >
-	<div class="flex sm:flex-row gap-4 sm:gap-2 flex-col-reverse justify-between items-center py-2 px-4">
+	<div
+		class="flex sm:flex-row gap-4 sm:gap-2 flex-col-reverse justify-between items-center py-2 px-4"
+	>
 		<div class="flex gap-2 items-center gap-3">
-			<div class="bg-neutral-800 text-neutral-400 text-center min-w-[45px] py-2 px-3 text-2xl rounded-xl h-[fit-content]">
+			<div
+				class="bg-neutral-800 text-neutral-400 text-center min-w-[45px] py-2 px-3 text-2xl rounded-xl h-[fit-content]"
+			>
 				<span>{skill.icon ?? ''}</span>
 			</div>
 			<div>

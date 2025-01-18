@@ -36,10 +36,10 @@
 	let presets = $derived([
 		{
 			amount: 1,
-			effortName: "Custom",
-			note: ""
+			effortName: 'Custom',
+			note: ''
 		},
-		...((JSON.parse(storeUser.value?.prefs?.presets ?? '{}'))[skill.$id] ?? [])
+		...(JSON.parse(storeUser.value?.prefs?.presets ?? '{}')[skill.$id] ?? [])
 	]);
 
 	let activePreset = $state('Custom');
@@ -53,7 +53,8 @@
 	}
 
 	$effect(() => {
-		const presetEffortName = presets.find(preset => preset.effortName === activePreset)?.effortName ?? '';
+		const presetEffortName =
+			presets.find((preset) => preset.effortName === activePreset)?.effortName ?? '';
 		console.log(presetEffortName);
 		if (presetEffortName !== effortName) {
 			activePreset = 'Custom';
@@ -155,7 +156,7 @@
 		try {
 			const originalPrefs = await account.getPrefs();
 			const presets = JSON.parse(originalPrefs.presets ?? '{}');
-			if(!presets[skill.$id]) {
+			if (!presets[skill.$id]) {
 				presets[skill.$id] = [];
 			}
 
@@ -230,14 +231,12 @@
 			</div>
 
 			{#if presets.length > 1}
-			<div class="p-4 pb-0 overflow-y-auto">
-			
-				<div class="flex overflow-x-auto">
-					<div
-					class="flex bg-gray-100 hover:bg-gray-200 rounded-lg transition p-1 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-				>
-					{#each presets as preset}
-					
+				<div class="p-4 pb-0 overflow-y-auto">
+					<div class="flex overflow-x-auto">
+						<div
+							class="flex bg-gray-100 hover:bg-gray-200 rounded-lg transition p-1 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+						>
+							{#each presets as preset}
 								<nav
 									class="flex gap-x-1"
 									aria-label="Tabs"
@@ -251,16 +250,15 @@
 										aria-selected={true}
 										role="tab"
 									>
-										{preset.effortName.length > 10 ? preset.effortName.substring(0, 10) + '...' : preset.effortName}
+										{preset.effortName.length > 10
+											? preset.effortName.substring(0, 10) + '...'
+											: preset.effortName}
 									</button>
 								</nav>
-					
-					{/each}
+							{/each}
+						</div>
+					</div>
 				</div>
-				</div>
-				
-
-			</div>
 			{/if}
 
 			<div class="p-4 overflow-y-auto">
@@ -277,10 +275,10 @@
 				/>
 			</div>
 
-		
-			
 			<div class="p-4 overflow-y-auto">
-				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white">Note <span class="text-neutral-400 text-xs">(optional)</span></label>
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
+					>Note <span class="text-neutral-400 text-xs">(optional)</span></label
+				>
 				<input
 					type="text"
 					required={false}
@@ -322,7 +320,7 @@
 
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
 				<button
-					disabled={addingPreset || (!effortName)}
+					disabled={addingPreset || !effortName}
 					onclick={addPreset}
 					type="button"
 					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
