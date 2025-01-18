@@ -65,7 +65,7 @@
 	$effect(() => {
 		const presetEffortName =
 			presets.find((preset) => preset.effortName === activePreset)?.effortName ?? '';
-		console.log(presetEffortName);
+
 		if (presetEffortName !== effortName) {
 			activePreset = 'Custom';
 			isExactPreset = false;
@@ -104,7 +104,7 @@
 			const previousLevel = getLevel(oldXp);
 			const nextLevel = getLevel(skill.xp);
 
-			if (previousLevel !== nextLevel) {
+			if (previousLevel < nextLevel) {
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `${capitalizeFirstLetter(skill.name)} leveled up to ${nextLevel}`,
 					icon: skill.icon
@@ -297,18 +297,11 @@
 							class="flex bg-gray-100 hover:bg-gray-200 rounded-lg transition p-1 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 						>
 							{#each presets as preset}
-								<nav
-									class="flex gap-x-1"
-									aria-label="Tabs"
-									role="tablist"
-									aria-orientation="horizontal"
-								>
+								<nav class="flex gap-x-1" aria-label="Tabs">
 									<button
 										onclick={() => activatePreset(preset)}
 										type="button"
 										class={`py-1.5 px-2 inline-flex items-center gap-x-2 bg-transparent text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 font-medium rounded-lg hover:hover:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-white dark:focus:text-white active ${preset.effortName === activePreset ? 'bg-white text-gray-700 dark:bg-neutral-800 text-neutral-400 bg-gray-800' : ''}`}
-										aria-selected={true}
-										role="tab"
 									>
 										{preset.effortName.length > 10
 											? preset.effortName.substring(0, 10) + '...'

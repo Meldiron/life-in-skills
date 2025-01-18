@@ -47,7 +47,7 @@
 			// @ts-ignore
 			window.HSOverlay.close(document.getElementById('new-' + type));
 			toast.open({
-				type: 'log',
+				type: 'success',
 				message: 'Craving successfully created'
 			});
 			newName = '';

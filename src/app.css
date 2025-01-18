@@ -8,3 +8,14 @@
 	z-index: 300 !important;
 	position: absolute !important;
 }
+
+.notyf__dismiss {
+	padding-right: 40px !important;
+	background-color: transparent !important;
+}
+.notyf__wrapper {
+	padding: 8px 0px !important;
+}
+.notyf__dismiss-btn {
+	opacity: 20% !important;
+}

@@ -6,6 +6,7 @@
 	import { tick } from 'svelte';
 	import SkillDetail from './SkillDetail.svelte';
 	import { hasBonus } from '$lib/skills';
+	import { toast } from '$lib/toast';
 
 	interface Props {
 		skills: Skill[];
@@ -18,6 +19,18 @@
 		// @ts-ignore
 		window.HSOverlay.autoInit();
 	});
+
+	const toastMarkup = `
+        <div class="flex p-4">
+          <p class="text-sm text-gray-700 dark:text-neutral-400">Your email has been sent</p>
+          <div class="ms-auto">
+            <button onclick="tostifyCustomClose(this)" type="button" class="inline-flex shrink-0 justify-center items-center size-5 rounded-lg text-gray-800 opacity-50 hover:opacity-100 focus:outline-none focus:opacity-100 dark:text-white" aria-label="Close">
+              <span class="sr-only">Close</span>
+              <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+          </div>
+        </div>
+      `;
 
 	function openNewSkill() {
 		// @ts-ignore

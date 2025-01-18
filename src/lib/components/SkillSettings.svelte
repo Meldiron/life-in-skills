@@ -40,7 +40,7 @@
 					text: `Updated ${capitalizeFirstLetter(newSkillName)} skill`
 				});
 				toast.open({
-					type: 'log',
+					type: 'success',
 					message: 'Skill successfully updated'
 				});
 			} else {
@@ -55,7 +55,7 @@
 					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`
 				});
 				toast.open({
-					type: 'log',
+					type: 'success',
 					message: 'Skill successfully created'
 				});
 			}
@@ -101,7 +101,7 @@
 
 			await invalidateAll();
 			toast.open({
-				type: 'log',
+				type: 'success',
 				message: 'Skill successfully created'
 			});
 		} catch (err: any) {
