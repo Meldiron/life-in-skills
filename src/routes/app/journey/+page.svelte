@@ -141,12 +141,12 @@
 				<div class="flex gap-x-3">
 					<!-- Icon -->
 					<div
-						class={`relative ${index === day.activities.length - 1 ? 'after:hidden' : ''} after:absolute after:top-7 after:bottom-0 after:start-4 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700`}
+						class={`relative ${index === day.activities.length - 1 ? 'after:hidden' : ''} after:absolute after:top-7 after:bottom-0 after:start-4 after:w-px after:-translate-x-[-4px] after:bg-gray-200 dark:after:bg-neutral-700 text-neutral-500`}
 					>
 						<div
-							class="relative z-10 size-8 flex justify-center items-center bg-neutral-800 rounded-full"
+							class="relative z-10 size-10 flex justify-center items-center bg-neutral-800 rounded-full"
 						>
-							<p class="text-sm">{activity.icon ? activity.icon : ''}</p>
+							<p class="text-lg">{activity.icon ? activity.icon : ''}</p>
 						</div>
 					</div>
 					<!-- End Icon -->
