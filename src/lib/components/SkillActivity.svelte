@@ -17,11 +17,13 @@
 		effortName: string;
 	}
 
-	let { amount = $bindable(0), skill, id, effortName = $bindable(0) }: Props = $props();
+	let { amount = $bindable(1), skill, id, effortName = $bindable('') }: Props = $props();
 
 	let activityNote = $state('');
 
 	let experienceShowCustom = $state(false);
+
+	let isExactPreset = $state(false);
 
 	$effect(() => {
 		if (amount >= 10 && !experienceShowCustom) {
@@ -50,7 +52,15 @@
 		activityNote = preset.note;
 
 		activePreset = preset.effortName;
+
+		isExactPreset = preset.effortName === 'Custom' ? false : true;
 	}
+
+	$effect(() => {
+		if (effortName !== activePreset) {
+			isExactPreset = false;
+		}
+	});
 
 	$effect(() => {
 		const presetEffortName =
@@ -58,6 +68,7 @@
 		console.log(presetEffortName);
 		if (presetEffortName !== effortName) {
 			activePreset = 'Custom';
+			isExactPreset = false;
 		}
 	});
 
@@ -134,6 +145,7 @@
 			activityNote = '';
 			effortName = '';
 			activePreset = 'Custom';
+			isExactPreset = false;
 			amount = 1;
 		} catch (err: any) {
 			toast.open({
@@ -179,6 +191,7 @@
 			});
 
 			activePreset = effortName;
+			isExactPreset = true;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -186,6 +199,53 @@
 			});
 		} finally {
 			addingPreset = false;
+		}
+	}
+
+	let deletingPreset = $state(false);
+	async function deletePreset() {
+		if (!skill || deletingPreset) {
+			return;
+		}
+
+		deletingPreset = true;
+
+		try {
+			const originalPrefs = await account.getPrefs();
+			const presets = JSON.parse(originalPrefs.presets ?? '{}');
+			if (!presets[skill.$id]) {
+				presets[skill.$id] = [];
+			}
+
+			const newPresets = presets[skill.$id].filter(
+				(preset: any) => preset.effortName !== effortName
+			);
+
+			await account.updatePrefs({
+				...originalPrefs,
+				presets: JSON.stringify({
+					...presets,
+					[skill.$id]: newPresets
+				})
+			});
+
+			await invalidateAll();
+
+			toast.open({
+				type: 'success',
+				message: `Activity preset deleted.`
+			});
+
+			effortName = '';
+			activityNote = '';
+			amount = 1;
+		} catch (err: any) {
+			toast.open({
+				type: 'error',
+				message: err.message ? err.message : err.toString()
+			});
+		} finally {
+			deletingPreset = false;
 		}
 	}
 </script>
@@ -319,14 +379,25 @@
 			</div>
 
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
-				<button
-					disabled={addingPreset || !effortName}
-					onclick={addPreset}
-					type="button"
-					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
-				>
-					Save as preset
-				</button>
+				{#if isExactPreset}
+					<button
+						disabled={deletingPreset}
+						onclick={deletePreset}
+						type="button"
+						class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-red-500 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+					>
+						Delete preset
+					</button>
+				{:else}
+					<button
+						disabled={addingPreset || !effortName}
+						onclick={addPreset}
+						type="button"
+						class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+					>
+						Save as preset
+					</button>
+				{/if}
 				<button
 					disabled={addingXp}
 					type="submit"
