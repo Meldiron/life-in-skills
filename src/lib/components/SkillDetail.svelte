@@ -58,13 +58,9 @@
 					{skill.name ?? ''}
 				</h3>
 
-				{#if admin}
-					<p
-						class={`text-sm ${remainingXp <= 0 ? 'text-green-500' : 'text-green-500'} line-clamp-1`}
-					>
-						{skill.reward ?? 'No reward set yet'}
-					</p>
-				{/if}
+				<p class={`text-sm ${remainingXp <= 0 ? 'text-green-500' : 'text-green-500'} line-clamp-1`}>
+					{skill.reward ?? 'No reward set yet'}
+				</p>
 			</div>
 		</div>
 

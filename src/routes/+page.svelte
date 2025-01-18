@@ -47,4 +47,10 @@
 			Play as guest
 		</button>
 	</div>
+
+	<div class="mt-4">
+		<a href="/hero/meldiron" class="text-blue-500 underline text-sm font-lighter"
+			>See example skill-board</a
+		>
+	</div>
 </div>

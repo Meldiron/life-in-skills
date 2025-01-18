@@ -38,9 +38,7 @@
 </script>
 
 <div class="mt-6 grid grid-cols-8 sm:grid-cols-12 gap-3">
-	{#if admin}
-		<SkillsTotalLevel {skills} />
-	{/if}
+	<SkillsTotalLevel {skills} />
 
 	{#each skills as skill}
 		<button
@@ -83,10 +81,6 @@
 			</div>
 		</button>
 	{/each}
-
-	{#if !admin}
-		<SkillsTotalLevel {skills} />
-	{/if}
 
 	{#if admin}
 		<button
