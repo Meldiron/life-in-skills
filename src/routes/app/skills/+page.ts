@@ -7,7 +7,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const data = await parent();
 
 	const response = await databases.listDocuments<Skill>('main', 'skills', [
-		Query.equal('userId', data.user?.$id ?? '')
+		Query.equal('userId', data.user?.$id ?? ''),
+		Query.orderAsc('position')
 	]);
 
 	return {

@@ -14,6 +14,7 @@ export type Skill = {
 	reward: string;
 	xp: number;
 	lastActivityAt: string;
+	position: number;
 } & Models.Document;
 
 export type Combat = {

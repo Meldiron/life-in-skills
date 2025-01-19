@@ -28,7 +28,7 @@ export const toast = new Notyf({
 		{
 			type: 'success',
 			background: 'green',
-			duration: 50000,
+			duration: 5000,
 			dismissible: true,
 			ripple: false,
 			icon: false,

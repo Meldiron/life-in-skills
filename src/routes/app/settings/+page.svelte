@@ -13,6 +13,45 @@
 
 	let { data }: Props = $props();
 
+	$effect(() => {
+		const sortable = document.querySelector('#sortable-skills');
+
+		// @ts-ignore
+		new Sortable(sortable, {
+			animation: 250,
+			dragClass: '!rounded-none',
+			onEnd: function (event: any) {
+				const { oldIndex, newIndex } = event;
+
+				if (oldIndex !== newIndex) {
+					madeSkillSortChanges = true;
+
+					const newSkills = [];
+
+					let previous = false;
+					for (let i = 0; i < skills.length; i++) {
+						if (i === newIndex) {
+							if (previous) {
+								newSkills.push(skills[i]);
+								newSkills.push(skills[oldIndex]);
+							} else {
+								newSkills.push(skills[oldIndex]);
+								newSkills.push(skills[i]);
+							}
+						} else if (i === oldIndex) {
+							previous = true;
+							continue;
+						} else {
+							newSkills.push(skills[i]);
+						}
+					}
+
+					skills = newSkills;
+				}
+			}
+		});
+	});
+
 	// Public profile
 	let hasProfileOnInit = $derived(data.user?.prefs?.isPublic && data.user?.prefs?.publicPath);
 
@@ -183,6 +222,42 @@
 			});
 		} finally {
 			isDeleting = false;
+		}
+	}
+
+	let skills = [...data.skills];
+	let madeSkillSortChanges = $state(false);
+	let isUpdatingSkillSort = $state(false);
+	async function updateSkillSort() {
+		isUpdatingSkillSort = true;
+
+		try {
+			if (skills.length > 5) {
+				toast.open({
+					type: 'log',
+					message: 'This may take a moment...'
+				});
+			}
+
+			for (const skill of skills) {
+				await databases.updateDocument('main', 'skills', skill.$id, {
+					position: skills.indexOf(skill)
+				});
+			}
+
+			await invalidateAll();
+
+			toast.open({
+				type: 'success',
+				message: 'Skill sorting updated.'
+			});
+		} catch (err: any) {
+			toast.open({
+				type: 'error',
+				message: err.message ? err.message : err.toString()
+			});
+		} finally {
+			isUpdatingSkillSort = false;
 		}
 	}
 </script>
@@ -447,6 +522,78 @@
 			<button
 				type="submit"
 				disabled={!madeDailyBonusChanges || isUpdatingDailyBonus}
+				class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+			>
+				Update
+			</button>
+		</div>
+	</form>
+
+	<form
+		onsubmit={preventDefault(updateSkillSort)}
+		class="border rounded-xl shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700"
+	>
+		<div
+			class="mb-4 flex flex-col-reverse item-start sm:flex-row gap-3 justify-between sm:items-center"
+		>
+			<div class="flex items-start sm:items-center gap-x-3">
+				<span
+					class="size-8 shrink-0 flex justify-center items-center border border-gray-200 text-gray-500 rounded-lg dark:border-neutral-700 dark:text-neutral-500"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="size-5 text-neutral-400 shrink-0"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</span>
+				<div>
+					<p class="text-sm font-medium text-gray-800 dark:text-white">Skill sorting</p>
+					<p class="text-xs text-gray-500 dark:text-neutral-500">Re-order skills to your liking.</p>
+				</div>
+			</div>
+		</div>
+		<!-- End Uploading File Content -->
+
+		<ul id="sortable-skills" class="w-full flex flex-col">
+			{#each skills as skill}
+				<li
+					class="inline-flex items-center gap-x-3 py-3 px-4 cursor-grab text-sm font-medium bg-neutral-900 border border-neutral-700 text-neutral-400 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg"
+				>
+					{skill.icon} &nbsp; {skill.name}
+					<svg
+						class="shrink-0 size-4 ms-auto text-gray-400 dark:text-neutral-500"
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<circle cx="9" cy="12" r="1"></circle>
+						<circle cx="9" cy="5" r="1"></circle>
+						<circle cx="9" cy="19" r="1"></circle>
+						<circle cx="15" cy="12" r="1"></circle>
+						<circle cx="15" cy="5" r="1"></circle>
+						<circle cx="15" cy="19" r="1"></circle>
+					</svg>
+				</li>
+			{/each}
+		</ul>
+
+		<div class="flex justify-end mt-3">
+			<button
+				type="submit"
+				disabled={!madeSkillSortChanges || isUpdatingSkillSort}
 				class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
 			>
 				Update

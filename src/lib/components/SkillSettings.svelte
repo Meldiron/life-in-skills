@@ -49,7 +49,8 @@
 					reward: newSkillReward,
 					icon: newSkillEmoji ? newSkillEmoji : '❓',
 					targetLevel: newSkillTargetLevel,
-					userId: storeUser?.value?.$id ?? ''
+					userId: storeUser?.value?.$id ?? '',
+					position: 999999
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
 					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`
@@ -102,7 +103,7 @@
 			await invalidateAll();
 			toast.open({
 				type: 'success',
-				message: 'Skill successfully created'
+				message: 'Skill successfully deleted'
 			});
 		} catch (err: any) {
 			toast.open({
