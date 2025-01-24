@@ -1,12 +1,47 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Skills from '$lib/components/Skills.svelte';
+	import { NinjaKeys } from 'ninja-keys';
 
 	interface Props {
 		data: PageData;
 	}
 
 	let { data }: Props = $props();
+
+	let hotkeys: any[] = [];
+	const presets = JSON.parse(data.user?.prefs?.presets ?? '{}');
+	for (const skill of data.skills) {
+		const preset = presets[skill.$id] ?? [];
+		hotkeys.push({
+			section: 'Add XP',
+			id: skill.name,
+			title: skill.name,
+			mdIcon: skill.icon,
+			children: preset.map((preset: any) => preset.effortName)
+		});
+
+		for (const item of preset) {
+			hotkeys.push({
+				parent: skill.name,
+				id: item.effortName,
+				title: item.effortName,
+				mdIcon: 'add', // mdIcons: https://materialui.co/icons
+				handler: () => {
+					document
+						.getElementById('skill-activity-' + skill.$id)
+						?.dispatchEvent(new CustomEvent('activatepreset', { detail: item }));
+					// @ts-ignore
+					window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.open();
+				}
+			});
+		}
+	}
+
+	$effect(() => {
+		const ninja = document.querySelector('ninja-keys') as any;
+		ninja.data = hotkeys;
+	});
 </script>
 
 <h2
@@ -32,4 +67,7 @@
 	</div>
 </h2>
 
-<Skills skills={data.skills} admin={true} />
+<Skills highlightDaily={data.highlightDaily} skills={data.skills} admin={true} />
+
+<ninja-keys style="--ninja-z-index: 9999;" class="dark" placeholder="Enter activity name..."
+></ninja-keys>

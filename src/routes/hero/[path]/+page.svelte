@@ -38,5 +38,5 @@
 </div>
 
 <div class="mt-6">
-	<Skills skills={data.skills} admin={false} />
+	<Skills highlightDaily={data.highlightDaily} skills={data.skills} admin={false} />
 </div>

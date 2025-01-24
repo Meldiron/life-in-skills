@@ -131,8 +131,15 @@
 	let dailyBonus2 = $derived(data.user?.prefs?.dailyBonus ?? 3);
 	let dailyBonus = $state(dailyBonus2);
 
+	let highlightDaily2 = $derived(data.user?.prefs?.highlightDaily ?? false);
+	let highlightDaily = $state(highlightDaily2);
+
 	let originalDailyBonus = $derived(data.user?.prefs?.dailyBonus ?? 3);
-	let madeDailyBonusChanges = $derived(dailyBonus !== originalDailyBonus);
+	let originalHighlightDaily = $derived(data.user?.prefs?.highlightDaily ?? false);
+
+	let madeDailyBonusChanges = $derived(
+		dailyBonus !== originalDailyBonus || highlightDaily !== originalHighlightDaily
+	);
 
 	let isUpdatingDailyBonus = $state(false);
 	async function updateDailyBonus() {
@@ -146,7 +153,8 @@
 			const originalPrefs = await account.getPrefs();
 			await account.updatePrefs({
 				...originalPrefs,
-				dailyBonus
+				dailyBonus,
+				highlightDaily
 			});
 
 			await invalidateAll();
@@ -517,6 +525,23 @@
 			</div>
 		</div>
 		<!-- End Input Number -->
+
+		<!-- Switch/Toggle -->
+		<div class="relative inline-block w-full mt-4">
+			<p class="text-sm text-neutral-300 mb-2 ml-1">Highlight skills with bonus available</p>
+			<input
+				type="checkbox"
+				id="hs-small-switch-soft"
+				class="peer relative w-11 h-6 p-px bg-gray-100 border border-gray-200 text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-blue-100 checked:border-blue-200 focus:checked:border-blue-200 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-800/30 dark:checked:border-blue-800 dark:focus:ring-offset-gray-600
+		  
+			before:inline-block before:size-5 before:bg-white checked:before:bg-blue-600 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-500"
+				bind:checked={highlightDaily}
+			/>
+			<label for="hs-basic-with-description-unchecked" class="text-sm ms-1 dark:text-neutral-100"
+				>{highlightDaily ? 'Enabled' : 'Disabled'}</label
+			>
+		</div>
+		<!-- End Switch/Toggle -->
 
 		<div class="flex justify-end mt-3">
 			<button

@@ -50,11 +50,20 @@
 		amount = preset.amount;
 		effortName = preset.effortName === 'Custom' ? '' : preset.effortName;
 		activityNote = preset.note;
-
 		activePreset = preset.effortName;
-
 		isExactPreset = preset.effortName === 'Custom' ? false : true;
 	}
+
+	$effect(() => {
+		document.getElementById(id)?.addEventListener('activatepreset', (event: any) => {
+			const detail = event.detail as any;
+			amount = detail.amount;
+			effortName = detail.effortName;
+			activityNote = detail.note;
+			activePreset = detail.effortName;
+			isExactPreset = true;
+		});
+	});
 
 	$effect(() => {
 		if (effortName !== activePreset) {

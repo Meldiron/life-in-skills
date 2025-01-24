@@ -1,6 +1,12 @@
 import type { PageServerLoad } from './$types';
 import { serverDatabases, serverUsers } from '$lib/appwrite.server';
-import { type PublicProfile, type Combat, type AccountPrefs, type Skill } from '$lib/appwrite';
+import {
+	type PublicProfile,
+	type Combat,
+	type AccountPrefs,
+	type Skill,
+	databases
+} from '$lib/appwrite';
 import { Query } from 'appwrite';
 import { ID, Permission, Role } from 'node-appwrite';
 
@@ -45,6 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	return {
 		name: user.prefs?.publicNickname ?? 'Hero',
+		highlightDaily: user.prefs?.highlightDaily ?? false,
 		path,
 		skills,
 		combat

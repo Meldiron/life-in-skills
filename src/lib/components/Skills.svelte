@@ -11,26 +11,15 @@
 	interface Props {
 		skills: Skill[];
 		admin: boolean;
+		highlightDaily: boolean;
 	}
 
-	let { skills, admin = false }: Props = $props();
+	let { skills, admin, highlightDaily }: Props = $props();
 
 	$effect(() => {
 		// @ts-ignore
 		window.HSOverlay.autoInit();
 	});
-
-	const toastMarkup = `
-        <div class="flex p-4">
-          <p class="text-sm text-gray-700 dark:text-neutral-400">Your email has been sent</p>
-          <div class="ms-auto">
-            <button onclick="tostifyCustomClose(this)" type="button" class="inline-flex shrink-0 justify-center items-center size-5 rounded-lg text-gray-800 opacity-50 hover:opacity-100 focus:outline-none focus:opacity-100 dark:text-white" aria-label="Close">
-              <span class="sr-only">Close</span>
-              <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-            </button>
-          </div>
-        </div>
-      `;
 
 	function openNewSkill() {
 		// @ts-ignore
@@ -56,7 +45,7 @@
 	{#each skills as skill}
 		<button
 			onclick={() => activateSkill(skill)}
-			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : !hasBonus(skill) ? 'border-neutral-700' : 'border-neutral-400'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br ${!hasBonus(skill) ? 'from-neutral-900 via-neutral-900 to-neutral-950' : 'from-neutral-800 via-neutral-800 to-neutral-900'} text-neutral-400 relative overflow-hidden`}
+			class={`${getLevel(skill.xp) >= skill.targetLevel ? 'border-yellow-600' : !hasBonus(skill) || !highlightDaily ? 'border-neutral-700 from-neutral-900 via-neutral-900 to-neutral-950' : 'border-neutral-400 from-neutral-800 via-neutral-800 to-neutral-900'} col-span-4 flex flex-row justify-between items-center border shadow-sm rounded-lg p-4 md:p-5 bg-gradient-to-br text-neutral-400 relative overflow-hidden`}
 		>
 			{#if admin}
 				<div class="absolute -right-[1px] -top-[1px] pointer-events-none z-[10]">

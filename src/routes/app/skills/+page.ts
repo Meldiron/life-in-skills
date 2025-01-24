@@ -12,6 +12,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	]);
 
 	return {
-		skills: response.documents
+		skills: response.documents,
+		highlightDaily: data.user?.prefs?.highlightDaily ?? false
 	};
 };

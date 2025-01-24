@@ -5,6 +5,8 @@ export type AccountPrefs = {
 	isPublic: boolean;
 	publicPath: string;
 	publicNickname: string;
+	highlightDaily: boolean;
+	presets: string; // array<{ amount, effortName, note }>
 } & Models.Preferences;
 
 export type Skill = {
