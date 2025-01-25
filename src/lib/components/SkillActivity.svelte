@@ -12,17 +12,15 @@
 
 	interface Props {
 		id: string;
-		amount: number;
 		skill: Skill;
-		effortName: string;
 	}
 
-	let { amount = $bindable(1), skill, id, effortName = $bindable('') }: Props = $props();
+	let { skill, id }: Props = $props();
 
+	let effortName = $state('');
+	let amount = $state(1);
 	let activityNote = $state('');
-
 	let experienceShowCustom = $state(false);
-
 	let isExactPreset = $state(false);
 
 	$effect(() => {
@@ -30,8 +28,6 @@
 			experienceShowCustom = true;
 		}
 	});
-
-	let size = $state(amount === 1 ? 'small' : amount === 5 ? 'medium' : 'big');
 
 	let bonusXp = storeUser.value?.prefs?.dailyBonus ?? 3;
 
@@ -139,15 +135,15 @@
 			window.HSOverlay.getInstance('#skill-detail-' + skill.$id, true).element.open();
 
 			setTimeout(() => {
-				if (size === 'small') {
-					// @ts-ignore
-					celebrateSmall();
-				} else if (size === 'medium') {
-					// @ts-ignore
-					celebrateMedium();
-				} else if (size === 'big') {
+				if (amount >= 10) {
 					// @ts-ignore
 					celebrateBig();
+				} else if (amount >= 5) {
+					// @ts-ignore
+					celebrateMedium();
+				} else {
+					// @ts-ignore
+					celebrateSmall();
 				}
 			}, 300);
 
@@ -351,33 +347,52 @@
 			</div>
 
 			<div class="p-4 overflow-y-auto">
-				<label for="input-label" class="mb-2 block text-sm font-medium dark:text-white">
-					{#if !experienceShowCustom}
-						<span class="mr-0.5 font-bold text-white rounded-xl bg-neutral-900 px-3 py-1"
-							>{amount}</span
+				<label for="input-label" class="block text-sm font-medium mb-2 dark:text-white"
+					>Effort <span class="text-red-400 text-xs">(required)</span></label
+				>
+				<div class="grid grid-cols-10 w-full gap-2">
+					{#each [{ amount: [1, 2, 3], class: 'border-blue-500', classActive: '!bg-blue-500' }, { amount: [4, 5, 6], class: 'border-green-500', classActive: '!bg-green-500' }, { amount: [7, 8], class: 'border-orange-500', classActive: '!bg-orange-500' }, { amount: [9, 10], class: 'border-red-500', classActive: '!bg-red-500' }] as range, rangeIndex}
+						<div
+							class="relative flex w-full gap-1"
+							style={`grid-column: span ${range.amount.length} / span ${range.amount.length}; margin-top: ${100 - range.amount[range.amount.length - 1] * 10}px;`}
 						>
-					{/if}
-					<span>Experience</span>
-				</label>
-				<input
-					bind:value={amount}
-					type="range"
-					class="w-full bg-transparent cursor-pointer appearance-none disabled:opacity-50 disabled:pointer-events-none focus:outline-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:-mt-0.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(37,99,235,1)] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:dark:bg-neutral-700 [&::-moz-range-thumb]:w-2.5 [&::-moz-range-thumb]:h-2.5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-blue-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-webkit-slider-runnable-track]:w-full [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:bg-gray-100 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:dark:bg-neutral-700 [&::-moz-range-track]:w-full [&::-moz-range-track]:h-2 [&::-moz-range-track]:bg-gray-100 [&::-moz-range-track]:rounded-full"
-					aria-orientation="horizontal"
-					min="1"
-					max="10"
-					step="1"
-				/>
+							{#each range.amount as effort, effortIndex}
+								<button
+									type="button"
+									onclick={() => (amount = effort)}
+									aria-label="Effort level"
+									style={`margin-top: ${10 * (range.amount.length - 1) - effortIndex * 10}px; height: ${30 + 10 * effort}px;`}
+									class={`hover:bg-opacity-20 hover:bg-white w-full bg-neutral-700 border-b-2 ${range.class}  border-opacity-75 rounded-3xl rounded-b-none flex justify-center items-end pb-3 ${effortIndex === 0 ? 'rounded-bl-none' : ''} ${effortIndex === range.amount.length - 1 ? 'rounded-br-none' : ''} rounded-t-none relative rounded-t-lg ${amount === effort ? range.classActive + ' !bg-opacity-100' : ''}`}
+								>
+									<div
+										class={`w-[5px] h-[5px] rounded-full ${amount === effort ? 'bg-white' : 'bg-neutral-500'}`}
+									></div>
+								</button>
+							{/each}
+						</div>
+					{/each}
+				</div>
 
-				{#if experienceShowCustom}
-					<input
-						type="number"
-						required={true}
-						bind:value={amount}
-						class="mt-1.5 py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:placeholder-neutral-500 dark:text-neutral-400"
-						placeholder="Enter custom amount"
-					/>
-				{/if}
+				<div
+					class={`rounded-t-md rounded-xl p-2 px-2 bg-neutral-700 text-neutral-100 flex items-center mt-2 gap-1.5 border-[1px] border-opacity-75 ${amount >= 10 ? 'border-red-500' : amount >= 7 ? 'border-orange-500' : amount >= 4 ? 'border-green-500' : 'border-blue-500'}`}
+				>
+					{#if experienceShowCustom}
+						<input
+							type="number"
+							required={true}
+							bind:value={amount}
+							class="py-1 px-2 block w-20 rounded-lg text-sm bg-neutral-800 border border-neutral-500 placeholder-neutral-500 text-neutral-400"
+							placeholder="Amount"
+						/>
+					{:else}
+						<div
+							class="rounded-full bg-neutral-800 w-7 font-medium h-7 text-sm flex items-center justify-center"
+						>
+							{amount}
+						</div>
+					{/if}
+					<p class="text-sm text-neutral-300">Experience</p>
+				</div>
 			</div>
 
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">

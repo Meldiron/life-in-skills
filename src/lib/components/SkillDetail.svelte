@@ -26,12 +26,7 @@
 		window.HSOverlay.getInstance('#skill-edit-' + skill.$id, true).element.open();
 	}
 
-	let activityXp = $state(0);
-	let activityEffortName = $state('');
-	async function addActivity(amount: number, name: string) {
-		activityXp = amount;
-		activityEffortName = name;
-
+	async function addActivity() {
 		await tick();
 		// @ts-ignore
 		window.HSOverlay.getInstance('#skill-activity-' + skill.$id, true).element.open();
@@ -254,7 +249,7 @@
 
 			<div class="rounded-lg w-full">
 				<button
-					onclick={() => addActivity(1, '')}
+					onclick={() => addActivity()}
 					type="button"
 					class="rounded-lg sm:rounded-none py-3 px-4 w-full inline-flex flex flex-col items-center gap-x-2 -ms-px sm:first:rounded-s-lg first:ms-0 sm:last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 sm:p-5"
 				>
@@ -274,10 +269,5 @@
 
 {#if admin}
 	<SkillSettings id={`skill-edit-${skill.$id}`} {skill} />
-	<SkillActivity
-		id={`skill-activity-${skill.$id}`}
-		effortName={activityEffortName}
-		amount={activityXp}
-		{skill}
-	/>
+	<SkillActivity id={`skill-activity-${skill.$id}`} {skill} />
 {/if}
