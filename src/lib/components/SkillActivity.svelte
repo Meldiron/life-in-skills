@@ -306,10 +306,10 @@
 									<button
 										onclick={() => activatePreset(preset)}
 										type="button"
-										class={`py-1.5 px-2 inline-flex items-center gap-x-2 bg-transparent text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 font-medium rounded-lg hover:hover:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-white dark:focus:text-white active ${preset.effortName === activePreset ? 'bg-white text-gray-700 dark:bg-neutral-800 text-neutral-400 bg-gray-800' : ''}`}
+										class={`min-w-[max-content] py-1.5 px-2 inline-flex items-center gap-x-2 bg-transparent text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 font-medium rounded-lg hover:hover:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-white dark:focus:text-white active ${preset.effortName === activePreset ? 'bg-white text-gray-700 dark:bg-neutral-800 text-neutral-400 bg-gray-800' : ''}`}
 									>
-										{preset.effortName.length > 10
-											? preset.effortName.substring(0, 10) + '...'
+										{preset.effortName.length > 20
+											? preset.effortName.substring(0, 20) + '...'
 											: preset.effortName}
 									</button>
 								</nav>
@@ -362,7 +362,7 @@
 									onclick={() => (amount = effort)}
 									aria-label="Effort level"
 									style={`margin-top: ${10 * (range.amount.length - 1) - effortIndex * 10}px; height: ${30 + 10 * effort}px;`}
-									class={`hover:bg-opacity-20 hover:bg-white w-full bg-neutral-700 border-b-2 ${range.class}  border-opacity-75 rounded-3xl rounded-b-none flex justify-center items-end pb-3 ${effortIndex === 0 ? 'rounded-bl-none' : ''} ${effortIndex === range.amount.length - 1 ? 'rounded-br-none' : ''} rounded-t-none relative rounded-t-lg ${amount === effort ? range.classActive + ' !bg-opacity-100' : ''}`}
+									class={`hover:bg-opacity-20 hover:bg-white w-full bg-neutral-700 border-b-2 ${range.class} border-opacity-75 rounded-3xl rounded-b-none flex justify-center items-end pb-3 ${effortIndex === 0 ? 'rounded-bl-none' : ''} ${effortIndex === range.amount.length - 1 ? 'rounded-br-none' : ''} rounded-t-lg relative rounded-t-lg ${amount === effort ? range.classActive + ' !bg-opacity-100' : ''}`}
 								>
 									<div
 										class={`w-[5px] h-[5px] rounded-full ${amount === effort ? 'bg-white' : 'bg-neutral-500'}`}
@@ -374,7 +374,7 @@
 				</div>
 
 				<div
-					class={`rounded-t-md rounded-xl p-2 px-2 bg-neutral-700 text-neutral-100 flex items-center mt-2 gap-1.5 border-[1px] border-opacity-75 ${amount >= 10 ? 'border-red-500' : amount >= 7 ? 'border-orange-500' : amount >= 4 ? 'border-green-500' : 'border-blue-500'}`}
+					class={`rounded-xl p-2 px-2 bg-neutral-700 text-neutral-100 flex items-center mt-2 gap-1.5`}
 				>
 					{#if experienceShowCustom}
 						<input
