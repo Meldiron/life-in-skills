@@ -46,8 +46,9 @@
 			await databases.deleteDocument('main', 'combatActions', action.$id);
 			
 			const actionType = action.type === 'craving' ? 'craving' : 'potion';
+			const icon = action.type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `Deleted ${capitalizeFirstLetter(action.name)} ${actionType}`
+				text: `${icon} Deleted ${capitalizeFirstLetter(action.name)} ${actionType}`
 			});
 
 			await invalidateAll();
@@ -91,8 +92,9 @@
 			});
 
 			const prefix = action.type === 'craving' ? 'Craved' : 'Healed with';
+			const icon = action.type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `${prefix} ${capitalizeFirstLetter(action.name)}`
+				text: `${icon} ${prefix} ${capitalizeFirstLetter(action.name)}`
 			});
 
 			if (died) {
@@ -140,8 +142,9 @@
 				type,
 				power: newPower
 			});
+			const icon = type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `Added ${capitalizeFirstLetter(newName)} ${type}`
+				text: `${icon} Added ${capitalizeFirstLetter(newName)} ${type}`
 			});
 			await invalidateAll();
 			// @ts-ignore
