@@ -263,7 +263,7 @@
 					<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 					</svg>
-					Exit Edit
+					Exit Edit Mode
 				{:else}
 					<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
@@ -277,7 +277,7 @@
 			<!-- Cravings Section -->
 			<div class="border rounded-lg p-3 dark:bg-red-500/5 dark:border-red-700/25">
 				<h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3 text-center">Cravings</h4>
-				<div class="max-w-xs flex flex-col rounded-lg shadow-sm">
+				<div class="flex flex-col rounded-lg shadow-sm">
 					{#each getCravings(combatActions) as craving}
 						<div class="relative">
 							<button
@@ -332,7 +332,7 @@
 			<!-- Potions Section -->
 			<div class="border rounded-lg p-3 dark:bg-green-500/5 dark:border-green-700/25">
 				<h4 class="text-sm font-medium text-green-600 dark:text-green-400 mb-3 text-center">Potions</h4>
-				<div class="max-w-xs flex flex-col rounded-lg shadow-sm">
+				<div class="flex flex-col rounded-lg shadow-sm">
 					{#each getPotions(combatActions) as potion}
 						<div class="relative">
 							<button
