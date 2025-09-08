@@ -4,7 +4,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { databases, type Activity, type Skill, account } from '$lib/appwrite';
 	import { capitalizeFirstLetter } from '$lib/helpers';
-	import { getLevel } from '$lib/levels';
+	import { getLevel, getXp } from '$lib/levels';
 	import { hasBonus } from '$lib/skills';
 	import { toast } from '$lib/toast';
 	import { ID } from 'appwrite';
@@ -22,6 +22,7 @@
 	let activityNote = $state('');
 	let experienceShowCustom = $state(false);
 	let isExactPreset = $state(false);
+	let showExperienceCalculator = $state(false);
 
 	$effect(() => {
 		if (amount >= 10 && !experienceShowCustom) {
@@ -253,6 +254,24 @@
 			deletingPreset = false;
 		}
 	}
+
+	// Experience Calculator functionality
+	let currentLevel = $derived(getLevel(skill.xp));
+	
+	function openExperienceCalculator() {
+		showExperienceCalculator = true;
+		// Scroll to current level after modal opens
+		setTimeout(() => {
+			const currentLevelElement = document.getElementById(`level-${currentLevel}`);
+			if (currentLevelElement) {
+				currentLevelElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		}, 100);
+	}
+
+	function closeExperienceCalculator() {
+		showExperienceCalculator = false;
+	}
 </script>
 
 <div
@@ -395,6 +414,21 @@
 				</div>
 			</div>
 
+			{#if experienceShowCustom}
+				<div class="px-4 py-3 pt-0">
+					<div
+						class="mt-2 bg-blue-600 text-sm text-white rounded-lg p-4 dark:bg-blue-500"
+						role="alert"
+						tabindex="-1"
+						aria-labelledby="hs-solid-color-info-label"
+					>
+					 To see how much XP
+						you need to reach any level, check out
+						<button type="button" onclick={openExperienceCalculator} class="text-white underline">Experience Calculator</button>.
+					</div>
+				</div>
+			{/if}
+
 			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
 				{#if isExactPreset}
 					<button
@@ -426,3 +460,174 @@
 		</form>
 	</div>
 </div>
+
+<!-- Experience Calculator Modal -->
+{#if showExperienceCalculator}
+	<div
+		class="fixed inset-0 z-[90] bg-black bg-opacity-50 flex items-center justify-center p-4"
+		onclick={closeExperienceCalculator}
+		role="dialog"
+		tabindex="-1"
+	>
+		<div
+			onclick={(e) => e.stopPropagation()}
+			class="bg-white dark:bg-neutral-800 rounded-xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col"
+		>
+			<div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
+				<h3 class="font-bold text-gray-800 dark:text-white">Experience Calculator</h3>
+				<button
+					type="button"
+					onclick={closeExperienceCalculator}
+					class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600"
+					aria-label="Close"
+				>
+					<span class="sr-only">Close</span>
+					<svg
+						class="shrink-0 size-4"
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M18 6 6 18"></path>
+						<path d="m6 6 12 12"></path>
+					</svg>
+				</button>
+			</div>
+			
+			<!-- Current Level Info -->
+			<div class="px-4 py-4 bg-blue-50 dark:bg-blue-900/30 border-b dark:border-neutral-700">
+				<div class="flex flex-col gap-3">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+								{currentLevel}
+							</div>
+							<div>
+								<div class="font-semibold text-gray-800 dark:text-white text-lg">Level {currentLevel}</div>
+								<div class="text-sm text-blue-600 dark:text-blue-400 font-medium">Current Level</div>
+							</div>
+						</div>
+						<div class="text-right">
+							<div class="font-mono text-xl font-bold text-gray-800 dark:text-white">
+								{skill.xp.toLocaleString()}
+							</div>
+							<div class="text-sm text-gray-600 dark:text-gray-400 font-medium">Total XP</div>
+						</div>
+					</div>
+				
+					{#if currentLevel < 99}
+						<div class="flex items-center justify-between pt-3 border-t border-white/50 dark:border-white/10">
+							<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Next level needs:</span>
+							<div class="flex items-center gap-2 bg-white/70 dark:bg-black/20 px-3 py-1 rounded-full">
+								<span class="font-mono font-bold text-blue-600 dark:text-blue-400">
+									+{(getXp(currentLevel + 1) - skill.xp).toLocaleString()}
+								</span>
+								<span class="text-sm text-gray-600 dark:text-gray-400 font-medium">XP</span>
+							</div>
+						</div>
+					{:else}
+						<div class="pt-3 border-t border-white/50 dark:border-white/10">
+							<div class="text-center">
+								<span class="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg">
+									<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+										<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+									</svg>
+									Max Level Reached
+								</span>
+							</div>
+						</div>
+					{/if}
+				</div>
+			</div>
+			
+			<!-- Level List -->
+			<div class="flex-1 overflow-y-auto p-4">
+				<div class="space-y-2">
+					{#each Array.from({length: 99}, (_, i) => i + 1) as level}
+						<div 
+							id="level-{level}"
+							class={`flex justify-between items-center p-4 rounded-xl border ${
+								level === currentLevel 
+									? 'bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-300 shadow-md dark:from-blue-900/40 dark:to-indigo-900/40 dark:border-blue-500' 
+									: level < currentLevel
+									? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700'
+									: 'bg-gray-50 border-gray-200 dark:bg-neutral-700 dark:border-neutral-600'
+							}`}
+						>
+							<div class="flex items-center gap-4">
+								{#if level === currentLevel}
+									<div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+										<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+										</svg>
+									</div>
+								{:else if level < currentLevel}
+									<div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+										<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+										</svg>
+									</div>
+								{:else}
+									<div class="w-8 h-8 bg-gray-300 dark:bg-neutral-600 rounded-full flex items-center justify-center">
+										<div class="w-3 h-3 bg-gray-500 dark:bg-neutral-400 rounded-full"></div>
+									</div>
+								{/if}
+								<div>
+									<div class={`font-semibold text-lg ${
+										level === currentLevel 
+											? 'text-blue-800 dark:text-blue-200' 
+											: level < currentLevel 
+											? 'text-emerald-700 dark:text-emerald-300' 
+											: 'text-gray-800 dark:text-white'
+									}`}>
+										Level {level}
+									</div>
+									{#if level === currentLevel}
+										<div class="text-sm text-blue-600 dark:text-blue-400 font-medium">Current Level</div>
+									{:else if level > currentLevel}
+										<div class="text-sm text-gray-600 dark:text-neutral-400 font-medium">
+											+{(getXp(level) - skill.xp).toLocaleString()} XP from
+										</div>
+									{:else}
+										<div class="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Completed ✓</div>
+									{/if}
+								</div>
+							</div>
+							<div class="text-right">
+								<div class={`font-mono text-lg font-semibold ${
+									level === currentLevel 
+										? 'text-blue-700 dark:text-blue-300' 
+										: level < currentLevel 
+										? 'text-emerald-600 dark:text-emerald-400' 
+										: 'text-gray-600 dark:text-neutral-400'
+								}`}>
+									{getXp(level).toLocaleString()}
+								</div>
+								<div class="text-sm text-gray-500 dark:text-neutral-500 font-medium">
+									Total XP
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+			
+			<!-- Modal Footer -->
+			<div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
+				<button
+					onclick={closeExperienceCalculator}
+					type="button"
+					class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
