@@ -20,6 +20,8 @@
 	let creatingAction = $state(false);
 	let newName = $state('');
 	let newPower = $state(3);
+	let customPower = $state(1);
+	let isCustomPower = $state(false);
 
 	// Initialize HSOverlay for modal functionality
 	$effect(() => {
@@ -48,7 +50,8 @@
 			const actionType = action.type === 'craving' ? 'craving' : 'potion';
 			const icon = action.type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `${icon} Deleted ${capitalizeFirstLetter(action.name)} ${actionType}`
+				text: `Deleted ${capitalizeFirstLetter(action.name)} ${actionType}`,
+				icon: icon
 			});
 
 			await invalidateAll();
@@ -94,12 +97,14 @@
 			const prefix = action.type === 'craving' ? 'Craved' : 'Healed with';
 			const icon = action.type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `${icon} ${prefix} ${capitalizeFirstLetter(action.name)}`
+				text: `${prefix} ${capitalizeFirstLetter(action.name)}`,
+				icon: icon
 			});
 
 			if (died) {
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-					text: `You died in a combat`
+					text: `You died in a combat`,
+					icon: '💀'
 				});
 			}
 
@@ -137,14 +142,16 @@
 		creatingAction = true;
 
 		try {
+			const finalPower = isCustomPower ? customPower : newPower;
 			await databases.createDocument<CombatAction>('main', 'combatActions', ID.unique(), {
 				name: newName,
 				type,
-				power: newPower
+				power: finalPower
 			});
 			const icon = type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
-				text: `${icon} Added ${capitalizeFirstLetter(newName)} ${type}`
+				text: `Added ${capitalizeFirstLetter(newName)} ${type}`,
+				icon: icon
 			});
 			await invalidateAll();
 			// @ts-ignore
@@ -155,6 +162,8 @@
 			});
 			newName = '';
 			newPower = 3;
+			customPower = 1;
+			isCustomPower = false;
 		} catch (err: any) {
 			toast.open({
 				type: 'error',
@@ -443,13 +452,34 @@
 				<select
 					id="craving-power"
 					bind:value={newPower}
+					onchange={(e) => { isCustomPower = (e.target as HTMLSelectElement).value === 'custom'; }}
 					class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 				>
 					<option value={1}>-1 HP</option>
 					<option value={3}>-3 HP</option>
 					<option value={6}>-6 HP</option>
+					<option value="custom">Custom</option>
 				</select>
 			</div>
+
+			{#if isCustomPower}
+				<div>
+					<div class="flex justify-between items-center">
+						<label for="craving-custom-power" class="block text-sm font-medium mb-2 dark:text-white"
+							>Custom power (HP)</label
+						>
+					</div>
+					<input
+						id="craving-custom-power"
+						bind:value={customPower}
+						type="number"
+						min="1"
+						max="12"
+						class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+						placeholder="Enter HP amount"
+					/>
+				</div>
+			{/if}
 
 			<div>
 				<button
@@ -525,13 +555,34 @@
 				<select
 					id="potion-power"
 					bind:value={newPower}
+					onchange={(e) => { isCustomPower = (e.target as HTMLSelectElement).value === 'custom'; }}
 					class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 				>
 					<option value={1}>+1 HP</option>
 					<option value={3}>+3 HP</option>
 					<option value={6}>+6 HP</option>
+					<option value="custom">Custom</option>
 				</select>
 			</div>
+
+			{#if isCustomPower}
+				<div>
+					<div class="flex justify-between items-center">
+						<label for="potion-custom-power" class="block text-sm font-medium mb-2 dark:text-white"
+							>Custom power (HP)</label
+						>
+					</div>
+					<input
+						id="potion-custom-power"
+						bind:value={customPower}
+						type="number"
+						min="1"
+						max="12"
+						class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+						placeholder="Enter HP amount"
+					/>
+				</div>
+			{/if}
 
 			<div>
 				<button
