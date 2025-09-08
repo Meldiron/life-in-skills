@@ -34,7 +34,7 @@
 </h2>
 
 <div class="mt-6">
-	<CombatHealth combat={data.combat} admin={false} />
+	<CombatHealth combat={data.combat} combatActions={[]} admin={false} />
 </div>
 
 <div class="mt-6">

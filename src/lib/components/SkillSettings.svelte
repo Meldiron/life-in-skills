@@ -53,6 +53,7 @@
 					position: 999999
 				});
 				await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
+				    icon: newSkillEmoji,
 					text: `Started ${capitalizeFirstLetter(newSkillName)} skill`
 				});
 				toast.open({
