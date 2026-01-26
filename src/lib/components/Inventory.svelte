@@ -211,7 +211,9 @@
 	<div
 		class="border-b rounded-t-xl py-3 px-4 md:py-4 md:px-5 dark:border-neutral-700 flex justify-between items-center"
 	>
-		<h3 class="text-lg font-bold text-gray-800 dark:text-white">{admin ? 'Your Inventory' : 'Inventory'}</h3>
+		<h3 class="text-lg font-bold text-gray-800 dark:text-white">
+			{admin ? 'Your Inventory' : 'Inventory'}
+		</h3>
 		{#if admin}
 			<div class="flex gap-2">
 				<button
@@ -393,7 +395,9 @@
 		{#if inventoryItems.length === 0}
 			<div class="text-center py-8">
 				<div class="text-6xl mb-4">📦</div>
-				<p class="text-gray-500 dark:text-neutral-400">{admin ? 'Your inventory' : 'Inventory'} is empty</p>
+				<p class="text-gray-500 dark:text-neutral-400">
+					{admin ? 'Your inventory' : 'Inventory'} is empty
+				</p>
 				{#if admin}
 					<p class="text-sm text-gray-400 dark:text-neutral-500 mt-2">
 						Click "Add Item" to start collecting items
@@ -438,7 +442,9 @@
 							{:else if admin}
 								<button
 									onclick={() => updateCount(item)}
-									disabled={actionMode === 'withdraw' && (item.count === 0 || (quickActionAmount !== 'all' && quickActionAmount > item.count))}
+									disabled={actionMode === 'withdraw' &&
+										(item.count === 0 ||
+											(quickActionAmount !== 'all' && quickActionAmount > item.count))}
 									type="button"
 									aria-label="{actionMode === 'deposit'
 										? 'Deposit'
