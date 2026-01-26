@@ -20,7 +20,7 @@
 	let newCount = $state(1);
 	let usedEmojis: { [key: string]: string[] } = {};
 	let generatingEmoji = $state(false);
-	let quickActionAmount = $state(1);
+	let quickActionAmount: number | 'all' = $state(1);
 	let actionMode: 'deposit' | 'withdraw' = $state('deposit');
 
 	// Initialize HSOverlay for modal functionality
@@ -109,9 +109,19 @@
 	}
 
 	async function updateCount(item: InventoryItem) {
-		const amount = actionMode === 'deposit' ? quickActionAmount : -quickActionAmount;
-		const newCount = Math.max(0, item.count + amount);
-		const actualChange = newCount - item.count;
+		// Handle "all" in withdraw mode - set count to 0
+		let newCount: number;
+		let actualChange: number;
+
+		if (actionMode === 'withdraw' && quickActionAmount === 'all') {
+			newCount = 0;
+			actualChange = -item.count;
+		} else {
+			const amount =
+				actionMode === 'deposit' ? (quickActionAmount as number) : -(quickActionAmount as number);
+			newCount = Math.max(0, item.count + amount);
+			actualChange = newCount - item.count;
+		}
 
 		try {
 			await databases.updateDocument('main', 'inventory', item.$id, {
@@ -141,8 +151,8 @@
 	}
 
 	function setQuickAmount(amount: number | 'all', item?: InventoryItem) {
-		if (amount === 'all' && item) {
-			quickActionAmount = item.count;
+		if (amount === 'all') {
+			quickActionAmount = 'all';
 		} else if (typeof amount === 'number') {
 			quickActionAmount = amount;
 		}
@@ -259,7 +269,7 @@
 				<!-- Mode Toggle -->
 				<div class="flex flex-col sm:flex-row sm:items-center gap-3">
 					<label class="text-sm font-medium text-gray-800 dark:text-white whitespace-nowrap">
-						Action Mode:
+						Action
 					</label>
 					<div class="flex items-center gap-2">
 						<button
@@ -310,14 +320,21 @@
 				<!-- Amount Configuration -->
 				<div class="flex flex-col sm:flex-row sm:items-center gap-3">
 					<label class="text-sm font-medium text-gray-800 dark:text-white whitespace-nowrap">
-						Amount:
+						Quantity:
 					</label>
 					<div class="flex items-center gap-2 flex-wrap">
 						<input
-							bind:value={quickActionAmount}
+							value={quickActionAmount === 'all' ? '' : quickActionAmount}
+							onchange={(e) => {
+								const val = parseInt(e.currentTarget.value);
+								if (!isNaN(val) && val > 0) {
+									quickActionAmount = val;
+								}
+							}}
 							type="number"
 							min="1"
-							class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-[#e18f49] focus:ring-[#e18f49] dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
+							disabled={quickActionAmount === 'all'}
+							class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-[#e18f49] focus:ring-[#e18f49] dark:bg-neutral-800 dark:border-neutral-700 dark:text-white disabled:opacity-50 disabled:pointer-events-none"
 						/>
 						<button
 							onclick={() => setQuickAmount(1)}
@@ -354,6 +371,15 @@
 						>
 							28
 						</button>
+						{#if actionMode === 'withdraw'}
+							<button
+								onclick={() => setQuickAmount('all')}
+								type="button"
+								class={`py-2 px-3 text-xs font-medium rounded-lg border transition-colors ${quickActionAmount === 'all' ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-700 text-neutral-400 hover:border-neutral-600'}`}
+							>
+								All
+							</button>
+						{/if}
 					</div>
 				</div>
 			</div>
