@@ -5,6 +5,7 @@ import {
 	type Combat,
 	type AccountPrefs,
 	type Skill,
+	type InventoryItem,
 	databases
 } from '$lib/appwrite';
 import { Query } from 'appwrite';
@@ -50,11 +51,20 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const skills = skillsResponse.documents;
 
+	const inventoryResponse = await serverDatabases.listDocuments<InventoryItem>(
+		'main',
+		'inventory',
+		[Query.limit(100), Query.equal('userId', userId), Query.orderDesc('$createdAt')]
+	);
+
+	const inventoryItems = inventoryResponse.documents;
+
 	return {
 		name: user.prefs?.publicNickname ?? 'Hero',
 		highlightDaily: user.prefs?.highlightDaily ?? false,
 		path,
 		skills,
-		combat
+		combat,
+		inventoryItems
 	};
 };

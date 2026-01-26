@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Skills from '$lib/components/Skills.svelte';
 	import CombatHealth from '$lib/components/CombatHealth.svelte';
+	import Inventory from '$lib/components/Inventory.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -39,4 +40,8 @@
 
 <div class="mt-6">
 	<Skills highlightDaily={data.highlightDaily} skills={data.skills} admin={false} />
+</div>
+
+<div class="mt-6">
+	<Inventory inventoryItems={data.inventoryItems} admin={false} />
 </div>

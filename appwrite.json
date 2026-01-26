@@ -271,7 +271,8 @@
 					"type": "string",
 					"required": true,
 					"array": false,
-					"size": 255
+					"size": 255,
+					"encrypt": false
 				},
 				{
 					"key": "count",
@@ -287,7 +288,17 @@
 					"required": false,
 					"array": false,
 					"size": 10,
-					"default": "📦"
+					"default": "📦",
+					"encrypt": false
+				},
+				{
+					"key": "userId",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
 				}
 			],
 			"indexes": []

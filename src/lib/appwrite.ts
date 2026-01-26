@@ -44,6 +44,7 @@ export type InventoryItem = {
 	name: string;
 	count: number;
 	icon: string;
+	userId: string;
 } & Models.Document;
 
 const client = new Client();
