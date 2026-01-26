@@ -22,6 +22,10 @@
 			name: 'Combat'
 		},
 		{
+			url: '/app/inventory',
+			name: 'Inventory'
+		},
+		{
 			url: '/app/journey',
 			name: 'Journey'
 		}
@@ -30,6 +34,15 @@
 	$effect(() => {
 		// @ts-ignore
 		window.HSCollapse.autoInit();
+	});
+
+	// Close mobile menu after navigation
+	afterNavigate(() => {
+		const menu = document.getElementById('hs-navbar-cover-page');
+		if (menu && !menu.classList.contains('hidden')) {
+			// @ts-ignore
+			window.HSCollapse.hide(menu);
+		}
 	});
 </script>
 

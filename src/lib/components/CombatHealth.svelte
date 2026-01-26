@@ -46,7 +46,7 @@
 
 		try {
 			await databases.deleteDocument('main', 'combatActions', action.$id);
-			
+
 			const actionType = action.type === 'craving' ? 'craving' : 'potion';
 			const icon = action.type === 'craving' ? '⛔' : '❇️';
 			await databases.createDocument<Activity>('main', 'activity', ID.unique(), {
@@ -84,8 +84,8 @@
 				newHp = 12;
 				died = true;
 			}
-			
-			if(newHp > 12) {
+
+			if (newHp > 12) {
 				newHp = 12;
 			}
 
@@ -250,7 +250,9 @@
 
 <!-- Cravings and Potions Section -->
 {#if admin}
-	<div class="border border-t-0 rounded-b-xl shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700">
+	<div
+		class="border border-t-0 rounded-b-xl shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700"
+	>
 		<!-- Edit Mode Toggle -->
 		<div class="mb-4 flex justify-between items-center">
 			<h3 class="text-sm font-medium text-gray-800 dark:text-white">Combat Actions</h3>
@@ -261,12 +263,22 @@
 			>
 				{#if editMode}
 					<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						></path>
 					</svg>
-					Exit Edit Mode
+					Cancel
 				{:else}
 					<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+						></path>
 					</svg>
 					Edit
 				{/if}
@@ -276,7 +288,9 @@
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<!-- Cravings Section -->
 			<div class="border rounded-lg p-3 dark:bg-red-500/5 dark:border-red-700/25">
-				<h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3 text-center">Cravings</h4>
+				<h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3 text-center">
+					Cravings
+				</h4>
 				<div class="flex flex-col rounded-lg shadow-sm">
 					{#each getCravings(combatActions) as craving}
 						<div class="relative">
@@ -287,7 +301,9 @@
 								class="w-full py-3 px-4 inline-flex items-start gap-x-2 first:rounded-t-md text-sm font-medium focus:z-10 border-gray-200 border-b-0 border bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 							>
 								<div>
-									<span class="min-w-[max-content] inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-500">
+									<span
+										class="min-w-[max-content] inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-500"
+									>
 										-{craving.power} HP
 									</span>
 								</div>
@@ -302,7 +318,12 @@
 									aria-label="Delete {craving.name} craving"
 								>
 									<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+										></path>
 									</svg>
 								</button>
 							{/if}
@@ -331,7 +352,9 @@
 
 			<!-- Potions Section -->
 			<div class="border rounded-lg p-3 dark:bg-green-500/5 dark:border-green-700/25">
-				<h4 class="text-sm font-medium text-green-600 dark:text-green-400 mb-3 text-center">Potions</h4>
+				<h4 class="text-sm font-medium text-green-600 dark:text-green-400 mb-3 text-center">
+					Potions
+				</h4>
 				<div class="flex flex-col rounded-lg shadow-sm">
 					{#each getPotions(combatActions) as potion}
 						<div class="relative">
@@ -342,7 +365,9 @@
 								class="w-full p-3 inline-flex items-start gap-x-2 first:rounded-t-md text-sm font-medium focus:z-10 border-gray-200 border-b-0 border bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
 							>
 								<div>
-									<span class="min-w-[max-content] inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500">
+									<span
+										class="min-w-[max-content] inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500"
+									>
 										+{potion.power} HP
 									</span>
 								</div>
@@ -357,7 +382,12 @@
 									aria-label="Delete {potion.name} potion"
 								>
 									<svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+										></path>
 									</svg>
 								</button>
 							{/if}
@@ -422,10 +452,13 @@
 				</svg>
 			</button>
 		</div>
-		<form onsubmit={preventDefault(() => onCreateAction('craving'))} class="p-4 flex flex-col gap-4">
+		<form
+			onsubmit={preventDefault(() => onCreateAction('craving'))}
+			class="p-4 flex flex-col gap-4"
+		>
 			<p class="text-gray-800 dark:text-neutral-400">
-				Define a bad habit you want to quit. You lose health points every time you fail to resist the
-				craving.
+				Define a bad habit you want to quit. You lose health points every time you fail to resist
+				the craving.
 			</p>
 
 			<div>
@@ -452,7 +485,9 @@
 				<select
 					id="craving-power"
 					bind:value={newPower}
-					onchange={(e) => { isCustomPower = (e.target as HTMLSelectElement).value === 'custom'; }}
+					onchange={(e) => {
+						isCustomPower = (e.target as HTMLSelectElement).value === 'custom';
+					}}
 					class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 				>
 					<option value={1}>-1 HP</option>
@@ -555,7 +590,9 @@
 				<select
 					id="potion-power"
 					bind:value={newPower}
-					onchange={(e) => { isCustomPower = (e.target as HTMLSelectElement).value === 'custom'; }}
+					onchange={(e) => {
+						isCustomPower = (e.target as HTMLSelectElement).value === 'custom';
+					}}
 					class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
 				>
 					<option value={1}>+1 HP</option>

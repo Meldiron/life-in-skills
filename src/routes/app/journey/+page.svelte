@@ -52,8 +52,8 @@
 		loading = true;
 		try {
 			const response = await databases.listDocuments<Activity>('main', 'activity', [
+				Query.limit(100),
 				Query.orderDesc('$id'),
-				Query.limit(50),
 				Query.cursorAfter(data.activities[data.activities.length - 1].$id)
 			]);
 			if (response.documents.length === 0 || response.documents.length < 50) {

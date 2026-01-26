@@ -7,8 +7,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const data = await parent();
 
 	const response = await databases.listDocuments<Activity>('main', 'activity', [
-		Query.orderDesc('$id'),
-		Query.limit(50)
+		Query.limit(100),
+		Query.orderDesc('$id')
 	]);
 
 	return {

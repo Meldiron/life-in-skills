@@ -44,6 +44,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const skillsResponse = await serverDatabases.listDocuments<Skill>('main', 'skills', [
+		Query.limit(100),
 		Query.equal('userId', userId)
 	]);
 
