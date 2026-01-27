@@ -3,7 +3,6 @@ import type { Skill } from './appwrite';
 const maxLevel = 120;
 
 const levelsXp = [
-	0,
 	83,
 	174,
 	276,
